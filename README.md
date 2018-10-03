@@ -16,6 +16,8 @@ More info : TODO : Neo link
 This Lambda function is used behind API Gateway, S3 Bucket and the user's browser.
 Sequence Diagram :
 
+![Sequence Diagram](./diagram.svg)
+
 ```mermaid
 sequenceDiagram
 Browser ->> S3 Bucket: Get specific image size
