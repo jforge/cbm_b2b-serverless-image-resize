@@ -1,132 +1,165 @@
-[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+![Logo of the project](https://raw.githubusercontent.com/jehna/readme-best-practices/master/sample-logo.png)
+
 # serverless-image-resize
 > Inspired by : https://aws.amazon.com/fr/blogs/compute/resize-images-on-the-fly-with-amazon-s3-aws-lambda-and-amazon-api-gateway/
 
-Resize Images on the fly with Amazon S3, AWS Lambda, and Amazon API Gateway
+# Description
+
+This project is used as a Lambda function to resizes existing images in Amazon S3.
+When a targeted image size is not found in S3, a redirection rules calls the Amazon API Gateway which integrated with this Lambda to create the requested size.
+The next request for the resized image will be served from S3 directly.
+
+More info : TODO : Neo link
+
+# Process
+
+This Lambda function is used behind API Gateway, S3 Bucket and the user's browser.
+Sequence Diagram :
+
+```mermaid
+sequenceDiagram
+Browser ->> S3 Bucket: Get specific image size
+S3 Bucket -->>S3 Bucket : HttpErrorCode = 404 ? 
+S3 Bucket -->>Browser: Return the API Gateway URL
+Browser->> API Gateway : Get resized image.
+API Gateway ->> Lambda: Create resized image.
+Lambda ->> S3 Bucket: Get original image.
+Lambda ->> Lambda: Resize.
+Lambda ->> S3 Bucket: Put resized image.
+Lambda ->> API Gateway : Return the new resized URL.
+API Gateway ->> Browser : Return the new resized URL.
+```
+
+1.  A user requests a resized image from an S3 bucket through its static website hosting endpoint. The bucket has a routing rule configured to redirect to the resize API Gateway any request for an object that cannot be found.
+2.  The request is temporarily redirected to the resize API method.
+3.  The user’s browser follows the redirect and requests the resize operation via API Gateway.
+4.  The API Gateway method is configured to trigger this Lambda function to serve the request.
+5.  The Lambda function downloads the original image from the S3 bucket, resizes it, and uploads the resized image back into the bucket as the originally requested key.
+6.  When the Lambda function completes, API Gateway permanently redirects the user to the file stored in S3.
+7.  The user’s browser requests the now-available resized image from the S3 bucket.
+8.  If the resized image is deleted in the future, the above process repeats and the resized image is re-created and replaced into the S3 bucket.
+
 
 ## Installing / Getting started
 
-A quick introduction of the minimal setup you need to get a hello world up &
-running.
+Here's a brief intro about what a developer must do in order to start developing the project further:
 
 ```shell
-packagemanager install awesome-project
-awesome-project start
-awesome-project "Do something!"  # prints "Nah."
+git clone https://github.com/axel-springer-kugawana/cbm_serverless-image-resize.git
+cd cbm_serverless-image-resize/
 ```
+To buid this project you will need **Node 8.10 (or 6.10)** to be compatible with Lambda's versions.
 
-Here you should say what actually happens when you execute the code above.
-
-### Initial Configuration
-
-Some projects require initial configuration (e.g. access tokens or keys, `npm i`).
-This is the section where you would document those requirements.
-
-## Developing
-
-Here's a brief intro about what a developer must do in order to start developing
-the project further:
-
+- You can use this docker image to use **Node 8.10** this project :
 ```shell
-git clone https://github.com/your/awesome-project.git
-cd awesome-project/
-packagemanager install
+# docker run -it -v "$PWD":/var/task lambci/lambda:build-nodejs8.10 /bin/bash
+```
+- Remove older installation and install : 
+```shell
+rm -rf node_modules/
+npm install
+exit
 ```
 
 And state what happens step-by-step.
 
-### Building
+## Deploying / Publishing
 
-If your project needs some additional steps for the developer to build the
-project after some code changes, state them here:
-
+- Create the package :
 ```shell
-./configure
-make
-make install
+rm -rf ../dev-lambda-resize-image.zip
+zip -r ../dev-lambda-resize-image.zip *
+```
+- Upload to S3 (it will be used as source for Lambda :
+```shell
+aws s3 cp ../dev-lambda-resize-image.zip s3://dev-vitrines-files/dev-lambda-resize-image.zip
 ```
 
-Here again you should state what actually happens when the code above gets
-executed.
+## Configuration / Parameters
 
-### Deploying / Publishing
 
-In case there's some step you have to take that publishes this project to a
-server, this is the right time to state it.
-
-```shell
-packagemanager deploy awesome-project -s server.com -u username -p password
-```
-
-And again you'd need to tell what the previous code actually does.
-
-## Features
-
-What's all the bells and whistles this project can perform?
-* What's the main functionality
-* You can also do another thing
-* If you get really randy, you can even do this
-
-## Configuration
-
-Here you should write what are all of the configurations a user can enter when
-using the project.
-
-#### Argument 1
+### 1. Query Parameters :
+- #### "key"
 Type: `String`  
-Default: `'default value'`
+The path of image to be resized. Example : `800x600/X000001/1b8d23ad3aacf8752bd72192123573fb.jpg`
 
-State what an argument does and how you can use it. If needed, you can provide
-an example below.
+### 2. Environnement :
+- #### "BUCKET"
+Type: `String`  
+The bucket name. Example. `dev-vitrines-files`
+- #### "URL"
+Type: `String`  
+The url of S3 storage. Example . https://s3-eu-west-1.amazonaws.com/
+- #### "ALLOWED_RESOLUTIONS"
+The list of allowed resolutions. Example `800x600`
 
-Example:
-```bash
-awesome-project "Some other value"  # Prints "You're nailing this readme!"
+
+## Lambda creation steps
+
+1. Create the new Lambda : vitrines-lambda-dev-resize-image
+2. Create a new Role and attach it to the Lambda   : vitrines-lambda-dev-resize-image-role
+3. Create a new Policies : vitrines-resize-image-s3-dev-vitrines-files-dev
+Description : Allow List, Read, Write on Bucket dev-vitrines-files
+Content : 
+```JSON
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": [
+                    "s3:ListBucket",
+                    "s3:PutObject",
+                    "s3:GetObject"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::dev-vitrines-files",
+                    "arn:aws:s3:::dev-vitrines-files/*"
+                ],
+                "Effect": "Allow"
+            }
+        ]
+    }
+```
+4. Bucket Configuration.
+Select the Bucket > Properties > Static website hosting > Use this bucket to host a website > Redirection rules :
+```XML
+<RoutingRules>
+  <RoutingRule>
+    <Condition>
+      <KeyPrefixEquals/>
+      <HttpErrorCodeReturnedEquals>404</HttpErrorCodeReturnedEquals>
+    </Condition>
+    <Redirect>
+      <Protocol>https</Protocol>
+      <HostName>7i8iyjew03.execute-api.eu-west-1.amazonaws.com</HostName>
+      <ReplaceKeyPrefixWith>dev/v1?key=</ReplaceKeyPrefixWith>
+      <HttpRedirectCode>307</HttpRedirectCode>
+    </Redirect>
+  </RoutingRule>
+</RoutingRules>
 ```
 
-#### Argument 2
-Type: `Number|Boolean`  
-Default: 100
 
-Copy-paste as many of these as you need.
+## Test 
 
-## Contributing
+You can use this Test Event to test this lambda function:
+EventResizeTest = 
+```
+{
+  "queryStringParameters": {
+      "key" : "/800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg"
+  }
+}
+```
 
-When you publish something open source, one of the greatest motivations is that
-anyone can just jump in and start contributing to your project.
 
-These paragraphs are meant to welcome those kind souls to feel that they are
-needed. You should state something like:
+Test KO : https://s3-eu-west-1.amazonaws.com/dev-vitrines-files/C000064/800x600/1b8d23ad3aacf8752bd72192123573fb.jpg
 
-"If you'd like to contribute, please fork the repository and use a feature
-branch. Pull requests are warmly welcome."
+Test OK : http://dev-vitrines-files.s3-website-eu-west-1.amazonaws.com/C000064/800x600/1b8d23ad3aacf8752bd72192123573fb.jpg
 
-If there's anything else the developer needs to know (e.g. the code style
-guide), you should link it here. If there's a lot of things to take into
-consideration, it is common to separate this section to its own file called
-`CONTRIBUTING.md` (or similar). If so, you should say that it exists here.
+This test will create the new sized image in new folder "800x600" .
+
 
 ## Links
 
-Even though this information can be found inside the project on machine-readable
-format like in a .json file, it's good to include a summary of most useful
-links to humans using your project. You can include links like:
-
-- Project homepage: https://your.github.com/awesome-project/
-- Repository: https://github.com/your/awesome-project/
-- Issue tracker: https://github.com/your/awesome-project/issues
-  - In case of sensitive bugs like security vulnerabilities, please contact
-    my@email.com directly instead of using issue tracker. We value your effort
-    to improve the security and privacy of this project!
-- Related projects:
-  - Your other project: https://github.com/your/other-project/
-  - Someone else's project: https://github.com/someones/awesome-project/
-
-
-## Licensing
-
-One really important part: Give your project a proper license. Here you should
-state what the license is and how to find the text version of the license.
-Something like:
-
-"The code in this project is licensed under MIT license."
+TODO : link to NEO.
