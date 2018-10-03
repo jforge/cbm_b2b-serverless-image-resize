@@ -1,0 +1,25 @@
+{
+  "name": "cbm_serverless-image-resize",
+  "version": "1.0.0",
+  "description": "![Logo of the project](https://raw.githubusercontent.com/jehna/readme-best-practices/master/sample-logo.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "commitmsg": "commitlint -E HUSKY_GIT_PARAMS"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/axel-springer-kugawana/cbm_serverless-image-resize.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/axel-springer-kugawana/cbm_serverless-image-resize/issues"
+  },
+  "homepage": "https://github.com/axel-springer-kugawana/cbm_serverless-image-resize#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^7.1.2",
+    "@commitlint/config-conventional": "^7.1.2",
+    "husky": "^1.1.0"
+  }
+}
