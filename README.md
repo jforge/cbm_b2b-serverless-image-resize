@@ -149,7 +149,7 @@ EventResizeTest =
 ```
 {
   "queryStringParameters": {
-      "key" : "/800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg"
+      "key" : "800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg"
   }
 }
 ```
