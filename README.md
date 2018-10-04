@@ -1,4 +1,4 @@
-![Logo of the project](https://raw.githubusercontent.com/jehna/readme-best-practices/master/sample-logo.png)
+
 
 # serverless-image-resize
 > Inspired by : https://aws.amazon.com/fr/blogs/compute/resize-images-on-the-fly-with-amazon-s3-aws-lambda-and-amazon-api-gateway/
@@ -10,6 +10,18 @@ When a targeted image size is not found in S3, a redirection rules calls the Ama
 The next request for the resized image will be served from S3 directly.
 
 More info : TODO : Neo link
+
+# Resize behaviour
+
+The Lambda resizes the image to `width` x `height` given in route params.
+
+Allowed combos : `300x220`, `150x110`, `650x330`
+
+
+:warning: **Preserving aspect ratio, it resizes the image to be as large as possible while ensuring its dimensions are less than or equal to the width and height specified.
+It does not enlarge the output image if the input image width or height are already less than the required dimensions.** 
+
+
 
 # Process
 
