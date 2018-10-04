@@ -58,9 +58,7 @@ To buid this project you will need **Node 8.10 (or 6.10)** to be compatible with
 ```
 - Remove older installation and install : 
 ```shell
-rm -rf node_modules/
-npm install
-exit
+rm -rf node_modules/ && npm i && exit
 ```
 
 And state what happens step-by-step.
@@ -69,8 +67,7 @@ And state what happens step-by-step.
 
 - Create the package :
 ```shell
-rm -rf ../dev-lambda-resize-image.zip
-zip -r ../dev-lambda-resize-image.zip *
+rm -rf ../dev-lambda-resize-image.zip && zip -r ../dev-lambda-resize-image.zip *
 ```
 - Upload to S3 (it will be used as source for Lambda :
 ```shell
@@ -155,9 +152,9 @@ EventResizeTest =
 ```
 
 
-Test KO : https://s3-eu-west-1.amazonaws.com/dev-vitrines-files/C000064/800x600/1b8d23ad3aacf8752bd72192123573fb.jpg
+Test KO : https://s3-eu-west-1.amazonaws.com/dev-vitrines-files/C800x600/000064/1b8d23ad3aacf8752bd72192123573fb.jpg
 
-Test OK : http://dev-vitrines-files.s3-website-eu-west-1.amazonaws.com/C000064/800x600/1b8d23ad3aacf8752bd72192123573fb.jpg
+Test OK : http://dev-vitrines-files.s3-website-eu-west-1.amazonaws.com/800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg
 
 This test will create the new sized image in new folder "800x600" .
 
