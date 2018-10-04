@@ -17,7 +17,11 @@
     "url": "https://github.com/axel-springer-kugawana/cbm_serverless-image-resize/issues"
   },
   "homepage": "https://github.com/axel-springer-kugawana/cbm_serverless-image-resize#readme",
+  "dependencies": {
+    "sharp": "^0.20.8"
+  },
   "devDependencies": {
+    "aws-sdk": "^2.36.0",
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
     "husky": "^1.1.0"
