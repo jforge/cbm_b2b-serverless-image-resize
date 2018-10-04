@@ -18,20 +18,6 @@ Sequence Diagram :
 
 ![Sequence Diagram](./diagram.svg)
 
-```mermaid
-sequenceDiagram
-Browser ->> S3 Bucket: Get specific image size
-S3 Bucket -->>S3 Bucket : HttpErrorCode = 404 ? 
-S3 Bucket -->>Browser: Return the API Gateway URL
-Browser->> API Gateway : Get resized image.
-API Gateway ->> Lambda: Create resized image.
-Lambda ->> S3 Bucket: Get original image.
-Lambda ->> Lambda: Resize.
-Lambda ->> S3 Bucket: Put resized image.
-Lambda ->> API Gateway : Return the new resized URL.
-API Gateway ->> Browser : Return the new resized URL.
-```
-
 1.  A user requests a resized image from an S3 bucket through its static website hosting endpoint. The bucket has a routing rule configured to redirect to the resize API Gateway any request for an object that cannot be found.
 2.  The request is temporarily redirected to the resize API method.
 3.  The user’s browser follows the redirect and requests the resize operation via API Gateway.
