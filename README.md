@@ -21,24 +21,9 @@ Allowed combos : `300x220`, `150x110`, `650x330`
 :warning: **Preserving aspect ratio, it resizes the image to be as large as possible while ensuring its dimensions are less than or equal to the width and height specified.
 It does not enlarge the output image if the input image width or height are already less than the required dimensions.** 
 
-
-
 # Process
 
-This Lambda function is used behind API Gateway, S3 Bucket and the user's browser.
-Sequence Diagram :
-
 ![Sequence Diagram](./diagram.svg)
-
-1.  A user requests a resized image from an S3 bucket through its static website hosting endpoint. The bucket has a routing rule configured to redirect to the resize API Gateway any request for an object that cannot be found.
-2.  The request is temporarily redirected to the resize API method.
-3.  The user’s browser follows the redirect and requests the resize operation via API Gateway.
-4.  The API Gateway method is configured to trigger this Lambda function to serve the request.
-5.  The Lambda function downloads the original image from the S3 bucket, resizes it, and uploads the resized image back into the bucket as the originally requested key.
-6.  When the Lambda function completes, API Gateway permanently redirects the user to the file stored in S3.
-7.  The user’s browser requests the now-available resized image from the S3 bucket.
-8.  If the resized image is deleted in the future, the above process repeats and the resized image is re-created and replaced into the S3 bucket.
-
 
 ## Installing / Getting started
 
