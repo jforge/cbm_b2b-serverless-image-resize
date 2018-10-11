@@ -7,7 +7,7 @@ phases:
 
 artifacts:
   files:
-    - index.js
+    - serverless.yml
 
 cache:
   paths:
