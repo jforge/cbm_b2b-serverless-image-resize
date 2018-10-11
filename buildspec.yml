@@ -5,6 +5,10 @@ phases:
     commands:
       - npm install
 
+artifacts:
+  files:
+    - index.js
+
 cache:
   paths:
     - '/node_modules/**/*'
