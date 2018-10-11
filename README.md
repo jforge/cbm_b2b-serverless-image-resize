@@ -11,6 +11,8 @@ The next request for the resized image will be served from S3 directly.
 
 More info : TODO : Neo link
 
+![Sequence Diagram](./Architecture.png)
+
 # Resize behaviour
 
 The Lambda resizes the image to `width` x `height` given in route params.
