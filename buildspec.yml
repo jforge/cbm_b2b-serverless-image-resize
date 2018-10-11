@@ -3,10 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
-      - yarn install
+      - npm install
 
 cache:
   paths:
-    - '/root/.m2/**/*'
     - '/node_modules/**/*'
 
