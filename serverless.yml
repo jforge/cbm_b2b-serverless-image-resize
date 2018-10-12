@@ -5,7 +5,7 @@ frameworkVersion: '=1.27'
 custom:
   apiGatewayTags:
     TagBloc: classified
-    TagApp: lcpab
+    TagApp: resize-image-app
     TagComp: resize-image
     Env: ${opt:stage}
   deploymentSettings:
@@ -106,20 +106,18 @@ provider:
   deploymentBucket: applications.${opt:stage}
   stackTags:
     Bloc: classified
-    App: lcpab
+    App: resize-image-app
     Comp: resize-image
     Env: ${opt:stage}
 
 functions:
-  IndexOnline:
+  ResizeImage:
     name: resize-image-${opt:stage}-IndexOnline
-    handler: fr.carboatmedia.resize-image.index.function.IndexOnline::handleRequest
+    handler: index.handler
     package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
+      artifact: index.js
     role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      queueName: resize-image-SQSCustomerReference-${opt:stage}
+    timeout: 10
     events:
     - stream:
         arn: ${self:custom.${opt:stage}.OnlineClassifiedStreamArn}
@@ -134,303 +132,6 @@ functions:
       - ${self:custom.${opt:stage}.Subnet2}
       - ${self:custom.${opt:stage}.Subnet3}
 
-  Index:
-    handler: fr.carboatmedia.resize-image.index.function.IndexHandler::handleRequest
-    name: resize-image-${opt:stage}-Index
-    onError: arn:aws:sns:${self:provider.region}:${self:custom.${opt:stage}.AccountId}:resize-image-DLQ-${opt:stage}
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      apiKeyRecherche: ${self:custom.${opt:stage}.ApiKeyRecherche}
-      resize-imageESAliasName: ${self:custom.${opt:stage}.ResizeImageESAliasName}
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-      proGateAccountsHost: ${self:custom.${opt:stage}.ProGateAccountsHost}
-      queueName: resize-image-SQSCustomerReference-${opt:stage}
-      urlApiRechercheAggregation: ${self:custom.${opt:stage}.UrlApiRechercheAggregation}
-    events:
-    - schedule:
-        rate: rate(5 minutes)
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  ProContractSNS:
-    name: resize-image-${opt:stage}-ProContractSNS
-    handler: fr.carboatmedia.resize-image.index.function.ProContractHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      queueName: resize-image-SQSCustomerReference-${opt:stage}
-    events:
-    - sns: arn:aws:sns:eu-west-1:${self:custom.${opt:stage}.AccountId}:progate-contract-bus-notification-${opt:stage}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  CreateIndex:
-    name: resize-image-${opt:stage}-CreateIndex
-    handler: fr.carboatmedia.resize-image.index.function.CreateIndexHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      resize-imageESAliasName: ${self:custom.${opt:stage}.ResizeImageESAliasName}
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  TriggerDisabler:
-    name: resize-image-${opt:stage}-TriggerDisabler
-    handler: fr.carboatmedia.resize-image.index.function.TriggerDisablerHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      progateSubscriptionArn: arn:aws:sns:eu-west-1:${self:custom.${opt:stage}.AccountId}:progate-contract-bus-notification-${opt:stage}
-      indexOnlineFunctionArn: arn:aws:lambda:eu-west-1:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-IndexOnline
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  TriggerEnabler:
-    name: resize-image-${opt:stage}-TriggerEnabler
-    handler: fr.carboatmedia.resize-image.index.function.TriggerEnablerHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      proContractSNSFunctionArn: arn:aws:lambda:eu-west-1:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-ProContractSNS
-      progateSubscriptionArn: arn:aws:sns:eu-west-1:${self:custom.${opt:stage}.AccountId}:progate-contract-bus-notification-${opt:stage}
-      indexOnlineFunctionArn: arn:aws:lambda:eu-west-1:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-IndexOnline
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  SwitchAlias:
-    name: resize-image-${opt:stage}-SwitchAlias
-    handler: fr.carboatmedia.resize-image.index.function.SwitchAliasHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      resize-imageESAliasName: ${self:custom.${opt:stage}.ResizeImageESAliasName}
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  DeleteIndexes:
-    name: resize-image-${opt:stage}-DeleteIndexes
-    handler: fr.carboatmedia.resize-image.index.function.DeleteIndexesHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  PurgeQueue:
-    name: resize-image-${opt:stage}-PurgeQueue
-    handler: fr.carboatmedia.resize-image.index.function.PurgeQueueHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      queueName: resize-image-SQSCustomerReference-${opt:stage}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  FullIndex:
-    name: resize-image-${opt:stage}-FullIndex
-    handler: fr.carboatmedia.resize-image.index.function.FullIndexHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 300
-    environment:
-      apiKeyRecherche: ${self:custom.${opt:stage}.ApiKeyRecherche}
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-      elasticSearchBulkSize: ${self:custom.${opt:stage}.ElasticSearchBulkSize}
-      proGateAccountsHost: ${self:custom.${opt:stage}.ProGateAccountsHost}
-      urlApiRechercheAggregation: ${self:custom.${opt:stage}.UrlApiRechercheAggregation}
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  ExecuteFullIndexChain:
-    name: resize-image-${opt:stage}-ExecuteFullIndexChain
-    handler: fr.carboatmedia.resize-image.index.function.ExecuteFullIndexChainHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-index/target/cbm_resize-image-index.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
-    timeout: 30
-    environment:
-      apiKeyRecherche: ${self:custom.${opt:stage}.ApiKeyRecherche}
-      fullIndexStepFunctionArn: { "Ref" : "ResizeImageFullIndexStepFunctionsStateMachine" }
-      restrictedIPRanges: ${self:custom.${opt:stage}.RestrictedIPRanges}
-      stage: ${opt:stage}
-    events:
-    - http:
-        path: /admin/reindex
-        method: POST
-    vpc:
-      securityGroupIds:
-      - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
-
-  Search:
-    name: resize-image-${opt:stage}-Search
-    handler: fr.carboatmedia.resize-image.search.function.SearchHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-search/target/cbm_resize-image-search.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-${opt:stage}
-    timeout: 30
-    environment:
-      corsAllowedDomains: ${self:custom.${opt:stage}.CorsAllowedDomains}
-      corsMethods: ${self:custom.${opt:stage}.CorsMethods}
-      resize-imageESAliasName: ${self:custom.${opt:stage}.ResizeImageESAliasName}
-      resize-imageESHost: ${self:custom.${opt:stage}.ResizeImageESHost}
-      restrictedIPRanges: ${self:custom.${opt:stage}.RestrictedIPRanges}
-      securityHeaderName: ${self:custom.${opt:stage}.SecurityHeaderName}
-    deploymentSettings:
-      type: ${self:custom.${opt:stage}.DeploymentType}
-      alias: live
-    events:
-    - http:
-        path: /v1/search
-        method: GET
-        private: false
-        cors:
-          origins:
-          - '*'
-          headers: ${self:custom.headers}
-          allowCredentials: false
-    - schedule:
-        rate: rate(1 minute)
-
-  Swagger:
-    name: resize-image-${opt:stage}-Swagger
-    handler: fr.carboatmedia.resize-image.search.function.SwaggerHandler::handleRequest
-    package:
-      artifact: cbm_resize-image-search/target/cbm_resize-image-search.jar
-    role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-${opt:stage}
-    timeout: 30
-    environment:
-      basePath: /
-      cloudFrontHost: { Fn::GetAtt: [ "ResizeImageCloudFrontDistribution", "DomainName" ] }
-      restrictedIPRanges: ${self:custom.${opt:stage}.RestrictedIPRanges}
-    events:
-    - http:
-        path: /api-docs
-        method: GET
-        private: false
-        cors:
-          origins:
-          - '*'
-          headers: ${self:custom.headers}
-          allowCredentials: false
-
-stepFunctions:
-  stateMachines:
-    resize-imageFullIndex:
-      name: resize-image-${opt:stage}-fullReindex
-      role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/service-role/StatesExecutionRole-${opt:region}
-      definition:
-        Comment: "Indexation totale des pros"
-        StartAt: TriggerDisabler
-        States:
-          TriggerDisabler:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-TriggerDisabler
-            Next: CreateIndex
-          CreateIndex:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-CreateIndex
-            Next: FullIndex
-          FullIndex:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-FullIndex
-            Catch:
-            - ErrorEquals:
-              - States.ALL
-              ResultPath: "$.error"
-              Next: TriggerEnabler
-            Next: SwitchAlias
-          SwitchAlias:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-SwitchAlias
-            Catch:
-            - ErrorEquals:
-              - States.ALL
-              ResultPath: "$.error"
-              Next: TriggerEnabler
-            Next: DeleteIndexes
-          DeleteIndexes:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-DeleteIndexes
-            Next: PurgeQueue
-          PurgeQueue:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-PurgeQueue
-            Next: TriggerEnabler
-          TriggerEnabler:
-            Type: Task
-            Resource: arn:aws:lambda:${opt:region}:${self:custom.${opt:stage}.AccountId}:function:resize-image-${opt:stage}-TriggerEnabler
-            End: true
-
 resources:
   Resources:
     ResizeImageCloudFrontDistribution:
@@ -440,7 +141,7 @@ resources:
           Aliases: ${self:custom.${opt:stage}.CloudFrontCnames}
           CacheBehaviors:
           - TargetOriginId: resize-image-apigateway-${opt:stage}
-            PathPattern: '/v1/search'
+            PathPattern: '/v1/resize-image'
             SmoothStreaming: 'false'
             AllowedMethods:
             - GET
@@ -535,84 +236,12 @@ resources:
         - Key: Bloc
           Value: classified
         - Key: App
-          Value: lcpab
+          Value: resize-image-app
         - Key: Comp
           Value: resize-image
         - Key: Env
           Value: ${opt:stage}
 
-    SubscriptionFilterIndexOnline:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "IndexOnlineLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterIndex:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "IndexLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterProContractSNS:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "ProContractSNSLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterCreateIndex:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "CreateIndexLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterTriggerDisabler:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "TriggerDisablerLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterTriggerEnabler:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "TriggerEnablerLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterSwitchAlias:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "SwitchAliasLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterDeleteIndexes:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "DeleteIndexesLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterPurgeQueue:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "PurgeQueueLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterFullIndex:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "FullIndexLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterExecuteFullIndexChain:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "ExecuteFullIndexChainLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
-    SubscriptionFilterSearch:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "SearchLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
     SubscriptionFilterSwagger:
       Type: "AWS::Logs::SubscriptionFilter"
       Properties:
