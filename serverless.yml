@@ -242,12 +242,12 @@ resources:
         - Key: Env
           Value: ${opt:stage}
 
-    SubscriptionFilterSwagger:
-      Type: "AWS::Logs::SubscriptionFilter"
-      Properties:
-        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "SwaggerLambdaFunction"}]]}
-        FilterPattern: "-START -END -REPORT"
-        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
+#    SubscriptionFilterSwagger:
+#      Type: "AWS::Logs::SubscriptionFilter"
+#      Properties:
+#        LogGroupName: { Fn::Join: ["", ["/aws/lambda/", {"Ref": "SwaggerLambdaFunction"}]]}
+#        FilterPattern: "-START -END -REPORT"
+#        DestinationArn: { Fn::Join: ["", ["arn:aws:lambda:", { Ref: "AWS::Region" }, ":", { Ref: "AWS::AccountId" }, ":function:", "${self:custom.${opt:stage}.StatsBridgeLog}" ]] }
 
 plugins:
 - serverless-plugin-canary-deployments
