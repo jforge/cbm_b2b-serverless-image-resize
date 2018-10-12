@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - yarn install
+  build:
+    commands:
+      - yarn sls:$ENV
+
+artifacts:
+  files:
+    - serverless.yml
+  discard-paths: yes
+
+cache:
+  paths:
+    - '/node_modules/**/*'

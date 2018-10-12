@@ -1,0 +1,427 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ResizeImage Codepipeline stack
+
+Parameters:
+  DisplayName:
+      Description: Project name
+      Type: String
+      Default: resize-image-codepipeline
+  Environment:
+    Description: Environment
+    Type: String
+    Default: dev
+    AllowedValues:
+    - dev
+    - rec
+    - prod
+  SourceOwnerName:
+    Description: Source repository owner name
+    Type: String
+    Default: axel-springer-kugawana
+    ConstraintDescription: Specify the Organisation
+  SourceRepoName:
+    Description: Source repository name
+    Type: String
+    Default: cbm_serverless-image-resize
+    ConstraintDescription: Only specify the repo name
+  TagBloc:
+    Description: Tag bloc metier
+    Type: String
+    Default: classified
+  TagApp:
+    Description: Tag application
+    Type: String
+    Default: lcpab
+  TagComp:
+    Description: Tag composant
+    Type: String
+    Default: resize-image
+  OAuthToken:
+    Description: Personal Access Token for GitHUB
+    Type: String
+    Default: abe9eaf6710c141c25da1bbab27717cabf321c35
+
+Mappings:
+  EnvironmentMap:
+    dev:
+      EsDomainName: classified-search-55-dev
+      SourceRepoBranch: dev
+      VPC: vpc-bc5badd7
+    rec:
+      EsDomainName: classified-search-55-rec
+      SourceRepoBranch: rec
+      VPC: vpc-cb11eaa0
+    prod:
+      EsDomainName: classified-search-55-prod
+      SourceRepoBranch: prod
+      VPC: vpc-f283b39a
+
+Resources:
+
+  CodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: !Join ['-', [!Ref 'DisplayName', 'codebuild', !Ref 'Environment']]
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codebuild.amazonaws.com
+            - cloudformation.amazonaws.com
+            - codedeploy.amazonaws.com
+            - states.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
+      Policies:
+      - PolicyName: !Join ['-', [!Ref DisplayName, "codebuild-build-policy", !Ref Environment]]
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:*
+            Resource:
+            - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment']]
+            - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/*']]
+            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment']]
+            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment', '/*']]
+          - Effect: Allow
+            Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:ListBucket
+            Resource:
+            - !Join ['', ['arn:aws:s3:::assets.lacentrale.', !Ref 'Environment', '/*']]
+          - Effect: Allow
+            Action:
+            - logs:*
+            Resource:
+            - !Join ['', ['arn:aws:logs:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':log-group:/aws/codebuild/*' ]]
+            - !Join ["", ["arn:aws:logs:", !Ref "AWS::Region",":", !Ref "AWS::AccountId",":", "log-group:/aws/lambda/resize-image-", !Ref Environment,"-*:*"]]
+          - Effect: "Allow"
+            Action:
+            - logs:Describe*
+            Resource: "*"            
+      - PolicyName: !Join ['-', [!Ref DisplayName, "codebuild-deploy-policy", !Ref Environment]]
+        PolicyDocument:
+          Statement:
+          - Action:
+            - cloudformation:*
+            Resource: !Join ["", ["arn:aws:cloudformation:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":stack/resize-image-", !Ref Environment, "/*"]]
+            Effect: Allow
+          - Action:
+            - cloudformation:ValidateTemplate
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - iam:PassRole
+            - iam:CreateRole
+            - iam:DeleteRole
+            - iam:AttachRolePolicy
+            - iam:DetachRolePolicy
+            - iam:DeleteRolePolicy
+            - iam:Get*
+            Resource: !Join ["", ["arn:aws:iam::", !Ref "AWS::AccountId", ":role/resize-image*", !Ref Environment, "*"]]
+            Effect: Allow
+          - Action:
+            - iam:PassRole
+            Resource:  !Join ["", ["arn:aws:iam::", !Ref "AWS::AccountId", ":role/service-role/StatesExecutionRole*"]]
+            Effect: Allow                        
+          - Action:
+            - codedeploy:*
+            Resource:
+            - !Join ["", ["arn:aws:codedeploy:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":application:", "resize-image-", !Ref Environment, "*"]]
+            - !Join ["", ["arn:aws:codedeploy:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":deploymentgroup:", "resize-image-", !Ref Environment, "*"]]
+            - !Join [":", ["arn:aws:codedeploy", !Ref "AWS::Region", !Ref "AWS::AccountId", "deploymentconfig", "*"]]
+            Effect: Allow        
+          - Action:
+            - lambda:*
+            Effect: Allow
+            Resource: !Join ["", ["arn:aws:lambda:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":function:resize-image-", !Ref Environment, "*"]]
+          - Action:
+            - lambda:CreateEventSourceMapping
+            - lambda:Get*
+            Effect: Allow
+            Resource: "*"            
+          - Action:
+            - lambda:InvokeFunction
+            Resource: "arn:aws:lambda:*:*:function:CodeDeployHook_*"
+            Effect: Allow
+          - Action:
+            - apigateway:*
+            Resource:
+            - !Join [":", ["arn:aws:apigateway", !Ref "AWS::Region", ":/restapis"]]
+            - !Join [":", ["arn:aws:apigateway", !Ref "AWS::Region", ":/restapis/*"]]
+            - !Join [":", ["arn:aws:apigateway", !Ref "AWS::Region", ":/tags"]]
+            - !Join [":", ["arn:aws:apigateway", !Ref "AWS::Region", ":/tags/*"]]
+            Effect: Allow
+          - Action:
+            - cloudwatch:DescribeAlarms
+            - sns:Publish
+            Resource: "*"
+            Effect: Allow
+          - Action:
+            - cloudfront:*
+            - states:* 
+            - ec2:Describe*
+            - events:*
+            Effect: Allow
+            Resource: "*"            
+          - Action:
+            - sns:ListSubscriptionsByTopic
+            - sns:Subscribe
+            - sns:Unsubscribe
+            Resource: "*"
+            Effect: Allow            
+            
+  CodeBuildProject:
+    Type: "AWS::CodeBuild::Project"
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: S3
+        Location: !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/codebuild/cache']]
+      Environment:
+         Type: LINUX_CONTAINER
+         ComputeType: BUILD_GENERAL1_SMALL
+         Image: !Sub ${AWS::AccountId}.dkr.ecr.eu-west-1.amazonaws.com/ci-containers/resize-image:latest
+         EnvironmentVariables:
+         - Name: ENV
+           Value: !Ref Environment
+      Name: !Join ['-', ["resize-image-codebuild", !Ref Environment]]
+      ServiceRole: !Ref CodeBuildRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: 'aws/codebuild/buildspec.yml'
+      Tags:
+      - Key: Name
+        Value: !Sub '${DisplayName}-${Environment}'
+      - Key: Env
+        Value: !Ref Environment
+      - Key: Bloc
+        Value: !Ref TagBloc
+      - Key: Comp
+        Value: !Ref TagComp
+      - Key: App
+        Value: !Ref TagApp
+
+  CodePipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Join ['-', [!Ref 'DisplayName', !Ref 'Environment']]
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: !Join ['-', [!Ref DisplayName, "codepipeline-s3-policy", !Ref Environment]]
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:GetObjectVersion
+            - s3:ListBucket
+            Resource:
+            - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment']]
+            - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/*']]
+      - PolicyName: !Join ['-', [!Ref DisplayName, "codepipeline-codebuild-policy", !Ref Environment]]
+        PolicyDocument:
+          Statement:
+          - Effect: "Allow"
+            Action:
+            - "codebuild:StartBuild"
+            - "codebuild:BatchGetBuilds"
+            Resource:
+            - !Join ['', ['arn:aws:codebuild:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':project/', !Ref 'CodeBuildProject' ]]
+            - !Join ['', ['arn:aws:codebuild:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':build/', !Ref 'CodeBuildProject', ':*' ]]
+
+  DeployPipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name: !Join ['-', [!Ref DisplayName, !Ref Environment]]
+      RoleArn:
+        Fn::GetAtt: [ CodePipelineRole, Arn ]
+      ArtifactStore:
+        Type: S3
+        Location: !Join ['', ['applications.', !Ref 'Environment']]
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                 Owner: !Ref SourceOwnerName
+                 Repo: !Ref SourceRepoName
+                 Branch: !FindInMap [EnvironmentMap, !Ref Environment, SourceRepoBranch]
+                 PollForSourceChanges: true
+                 OAuthToken: !Ref OAuthToken
+              OutputArtifacts:
+              - Name: SourceOutput
+              RunOrder: 1
+        - Name: Build
+          Actions:
+            - Name: Build
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+              - Name: SourceOutput
+              OutputArtifacts:
+              - Name: BuildOutput
+              RunOrder: 2
+
+  ResizeImageLambdaPrivRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'resize-image-lambda-vpc-${Environment}'
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+      Policies:
+        - PolicyName: LambdaAccessDynamo
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:*
+                Resource: !Sub 'arn:aws:dynamodb:eu-west-1:${AWS::AccountId}:table/online-classifieds-${Environment}'
+        - PolicyName: LambdaAccessDynamoRead
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetRecords
+                  - dynamodb:GetShardIterator
+                  - dynamodb:DescribeStream
+                  - dynamodb:ListStreams
+                Resource: "*"
+        - PolicyName: LambdaStartExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - states:StartExecution
+                Resource: "*"
+        - PolicyName: LambdaAccessSqs
+          PolicyDocument:
+            Statement:
+            - Effect: Allow
+              Action:
+              - sqs:*
+              Resource: 
+              - !Sub "arn:aws:sqs:eu-west-1:${AWS::AccountId}:resize-image-SQSCustomerReference-${Environment}"
+        - PolicyName: LambdaAccessStepFunction
+          PolicyDocument:
+            Statement:
+            - Action:
+              - states:*
+              Effect: Allow
+              Resource: "*"
+        - PolicyName: LambdaInvokeFunction
+          PolicyDocument:
+            Statement:
+            - Action:
+              - lambda:InvokeFunction
+              Effect: Allow
+              Resource: "*"
+        - PolicyName: LambdaAccessLambdaTrigger
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+            - Action:
+              - lambda:ListEventSourceMappings
+              Resource: "*"
+              Effect: Allow
+            - Action:
+              - lambda:UpdateEventSourceMapping
+              Resource: "*"
+              Effect: Allow
+        - PolicyName: LambdaAccessSns
+          PolicyDocument:
+            Statement:
+            - Action:
+              - sns:*
+              Effect: Allow
+              Resource: "*"
+
+  ResizeImageLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      RoleName: !Sub 'resize-image-lambda-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+      Policies:
+        - PolicyName: LambdaAccessES
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - es:ESHttpPost
+                  - es:ESHttpGet
+                Resource:
+                  - !Sub
+                    - arn:aws:es:eu-west-1:${AWS::AccountId}:domain/${EsDomainName}/*
+                    - EsDomainName: !FindInMap [EnvironmentMap, !Ref Environment, EsDomainName]
+
+################################################
+# SecurityGroup
+################################################
+              
+  ResizeImageLambdaSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "SecurityGroup ResizeImage"
+      VpcId: !FindInMap [EnvironmentMap, !Ref Environment, VPC]
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
