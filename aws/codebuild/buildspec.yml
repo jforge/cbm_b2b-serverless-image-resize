@@ -6,9 +6,7 @@ phases:
       - yarn install
   build:
     commands:
-#TODO      - yarn sls:$ENV
-      - yarn install
-
+      - yarn sls:$ENV
 
 artifacts:
   files:

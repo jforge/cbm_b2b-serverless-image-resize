@@ -5,7 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "commitmsg": "commitlint -E HUSKY_GIT_PARAMS"
+    "commitmsg": "commitlint -E HUSKY_GIT_PARAMS",
+    "sls:dev": "serverless deploy --stage dev",
+    "sls:dev:function": "serverless deploy function --stage dev",
+    "sls:rec": "serverless deploy --stage rec",
+    "sls:rec:function": "serverless deploy function --stage rec",
+    "sls:prod": "serverless deploy --stage prod",
+    "sls:prod:function": "serverless deploy function --stage prod"
   },
   "repository": {
     "type": "git",
@@ -18,12 +24,18 @@
   },
   "homepage": "https://github.com/axel-springer-kugawana/cbm_serverless-image-resize#readme",
   "dependencies": {
-    "sharp": "^0.20.8"
+    "sharp": "^0.20.8",
+    "request": "2.79.0",
+    "serverless-step-functions": "1.0.2"
   },
   "devDependencies": {
     "aws-sdk": "^2.36.0",
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
-    "husky": "^1.1.0"
+    "husky": "^1.1.0",
+    "serverless": "1.27.0",
+    "serverless-plugin-canary-deployments": "^0.4.2",
+    "serverless-tag-api-gateway": "^1.0.0"
   }
 }
+
