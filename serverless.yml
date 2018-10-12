@@ -114,12 +114,12 @@ functions:
   ResizeImage:
     name: resize-image-${opt:stage}-IndexOnline
     handler: index.handler
-    package:
-      exclude:
-        - Architecture.png
-      include:
-        - index.js
-        - node_modules/**
+#    package:
+#      exclude:
+#        - Architecture.png
+#      include:
+#        - index.js
+#        - node_modules/**
     role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
     timeout: 10
     events:
