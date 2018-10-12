@@ -115,7 +115,9 @@ functions:
     name: resize-image-${opt:stage}-IndexOnline
     handler: index.handler
     package:
-      artifact: index.js
+      include:
+      - index.js
+      - node_modules/**
     role: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-lambda-vpc-${opt:stage}
     timeout: 10
     events:
