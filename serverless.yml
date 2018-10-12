@@ -1,4 +1,5 @@
-service: resize-image
+# https://github.com/serverless/examples
+service: resize-image-stack
 
 frameworkVersion: '=1.27'
 
@@ -109,6 +110,9 @@ provider:
     App: resize-image-app
     Comp: resize-image
     Env: ${opt:stage}
+    BUCKET: dev-vitrines-files
+    URL: https://dev-vitrines-files.s3-eu-west-1.amazonaws.com
+    ALLOWED_RESOLUTIONS: 800x600
 
 functions:
   ResizeImage:
