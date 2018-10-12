@@ -1,3 +1,6 @@
+#####################################################################################
+# CLOUD FORMATION for Resize Image CodePipeline  : resize-image-codepipeline-dev  ###
+#####################################################################################
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: ResizeImage Codepipeline stack
@@ -32,7 +35,7 @@ Parameters:
   TagApp:
     Description: Tag application
     Type: String
-    Default: lcpab
+    Default: Resize Image App
   TagComp:
     Description: Tag composant
     Type: String
@@ -58,7 +61,9 @@ Mappings:
       VPC: vpc-f283b39a
 
 Resources:
-
+################################################
+# Code Build Role
+################################################
   CodeBuildRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -179,7 +184,9 @@ Resources:
             - sns:Unsubscribe
             Resource: "*"
             Effect: Allow            
-            
+################################################
+# Code Build Project
+################################################
   CodeBuildProject:
     Type: "AWS::CodeBuild::Project"
     Properties:
@@ -211,7 +218,9 @@ Resources:
         Value: !Ref TagComp
       - Key: App
         Value: !Ref TagApp
-
+################################################
+# Code Pipeline Role
+################################################
   CodePipelineRole:
     Type: AWS::IAM::Role
     Properties:
@@ -248,7 +257,9 @@ Resources:
             Resource:
             - !Join ['', ['arn:aws:codebuild:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':project/', !Ref 'CodeBuildProject' ]]
             - !Join ['', ['arn:aws:codebuild:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':build/', !Ref 'CodeBuildProject', ':*' ]]
-
+################################################
+# Deploy Pipeline
+################################################
   DeployPipeline:
     Type: "AWS::CodePipeline::Pipeline"
     Properties:
@@ -291,7 +302,9 @@ Resources:
               OutputArtifacts:
               - Name: BuildOutput
               RunOrder: 2
-
+################################################
+# Lamda Priv Role
+################################################
   ResizeImageLambdaPrivRole:
     Type: AWS::IAM::Role
     Properties:
@@ -380,7 +393,9 @@ Resources:
               - sns:*
               Effect: Allow
               Resource: "*"
-
+################################################
+# Lambda Role
+################################################
   ResizeImageLambdaRole:
     Type: AWS::IAM::Role
     Properties:
