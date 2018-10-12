@@ -100,7 +100,7 @@ package:
 
 provider:
   name: aws
-  runtime: java8
+  runtime: nodejs8.10
   region: eu-west-1
   memorySize: 1536
   deploymentBucket: applications.${opt:stage}
