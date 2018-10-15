@@ -133,7 +133,7 @@ Resources:
             - iam:DetachRolePolicy
             - iam:DeleteRolePolicy
             - iam:Get*
-            Resource: !Join ["", ["arn:aws:iam::", !Ref "AWS::AccountId", ":role/resize-image-lambda-stack-*", !Ref Environment, "*"]]
+            Resource: !Join ["", ["arn:aws:iam::", !Ref "AWS::AccountId", ":role/resize-image-lambda-stack*", !Ref Environment, "*"]]
             Effect: Allow
           - Action:
             - iam:PassRole
