@@ -1,6 +1,6 @@
 # https://github.com/serverless/examples
 service: resize-image-lambda
-
+description: Lambda function to resize images for PDV (Point De Vente)
 frameworkVersion: '=1.27'
 
 custom:
@@ -106,13 +106,10 @@ provider:
   memorySize: 1536
   deploymentBucket: applications.${opt:stage}
   stackTags:
-    Bloc: classified
-    App: resize-image-app
-    Comp: resize-image
-    Env: ${opt:stage}
+    Enviro: ${opt:stage}
+    ALLOWED_RESOLUTIONS: 800x600
     BUCKET: dev-vitrines-files
     URL: https://dev-vitrines-files.s3-eu-west-1.amazonaws.com
-    ALLOWED_RESOLUTIONS: 800x600
 
 functions:
   ResizeImage:

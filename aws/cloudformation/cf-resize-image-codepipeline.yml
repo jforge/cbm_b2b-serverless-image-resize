@@ -1,5 +1,5 @@
 ###########################################################################################
-# CLOUD FORMATION for Resize Image CodePipeline  : resize-image-codepipeline-stack-dev  ###
+# CLOUD FORMATION for Resize Image CodePipeline  : resize-image-codepipeline-dev  ###
 ###########################################################################################
 ---
 AWSTemplateFormatVersion: '2010-09-09'
