@@ -1,6 +1,6 @@
-#####################################################################################
-# CLOUD FORMATION for Resize Image CodePipeline  : resize-image-codepipeline-dev  ###
-#####################################################################################
+###########################################################################################
+# CLOUD FORMATION for Resize Image CodePipeline  : resize-image-codepipeline-stack-dev  ###
+###########################################################################################
 ---
 AWSTemplateFormatVersion: '2010-09-09'
 Description: ResizeImage Codepipeline stack
@@ -9,7 +9,7 @@ Parameters:
   DisplayName:
       Description: Project name
       Type: String
-      Default: resize-image-codepipeline
+      Default: resize-image-codepipeline-project
   Environment:
     Description: Environment
     Type: String
@@ -118,13 +118,14 @@ Resources:
           Statement:
           - Action:
             - cloudformation:*
-            Resource: !Join ["", ["arn:aws:cloudformation:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":stack/resize-image-", !Ref Environment, "/*"]]
+            Resource: !Join ["", ["arn:aws:cloudformation:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":stack/resize-image-lamdba-stack-", !Ref Environment, "/*"]]
             Effect: Allow
           - Action:
             - cloudformation:ValidateTemplate
             Resource: "*"
             Effect: Allow
           - Action:
+            - iam:PutRolePolicy
             - iam:PassRole
             - iam:CreateRole
             - iam:DeleteRole
@@ -358,7 +359,7 @@ Resources:
             - Effect: Allow
               Action:
               - sqs:*
-              Resource: 
+              Resource:
               - !Sub "arn:aws:sqs:eu-west-1:${AWS::AccountId}:resize-image-SQSCustomerReference-${Environment}"
         - PolicyName: LambdaAccessStepFunction
           PolicyDocument:

@@ -1,5 +1,5 @@
 # https://github.com/serverless/examples
-service: resize-image-stack
+service: resize-image-lambda-stack
 
 frameworkVersion: '=1.27'
 
@@ -135,10 +135,10 @@ functions:
     vpc:
       securityGroupIds:
       - ${self:custom.${opt:stage}.SecurityGroup}
-      subnetIds:
-      - ${self:custom.${opt:stage}.Subnet1}
-      - ${self:custom.${opt:stage}.Subnet2}
-      - ${self:custom.${opt:stage}.Subnet3}
+#      subnetIds:
+#      - ${self:custom.${opt:stage}.Subnet1}
+#      - ${self:custom.${opt:stage}.Subnet2}
+#      - ${self:custom.${opt:stage}.Subnet3}
 
 #resources:
 #  Resources:
