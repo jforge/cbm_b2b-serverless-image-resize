@@ -319,81 +319,81 @@ Resources:
               Service:
                 - lambda.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-        - arn:aws:iam::aws:policy/AWSLambdaExecute
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
-        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
-        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
-      Policies:
-        - PolicyName: LambdaAccessDynamo
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - dynamodb:*
-                Resource: !Sub 'arn:aws:dynamodb:eu-west-1:${AWS::AccountId}:table/online-classifieds-${Environment}'
-        - PolicyName: LambdaAccessDynamoRead
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - dynamodb:GetRecords
-                  - dynamodb:GetShardIterator
-                  - dynamodb:DescribeStream
-                  - dynamodb:ListStreams
-                Resource: "*"
-        - PolicyName: LambdaStartExecution
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - states:StartExecution
-                Resource: "*"
-        - PolicyName: LambdaAccessSqs
-          PolicyDocument:
-            Statement:
-            - Effect: Allow
-              Action:
-              - sqs:*
-              Resource:
-              - !Sub "arn:aws:sqs:eu-west-1:${AWS::AccountId}:resize-image-SQSCustomerReference-${Environment}"
-        - PolicyName: LambdaAccessStepFunction
-          PolicyDocument:
-            Statement:
-            - Action:
-              - states:*
-              Effect: Allow
-              Resource: "*"
-        - PolicyName: LambdaInvokeFunction
-          PolicyDocument:
-            Statement:
-            - Action:
-              - lambda:InvokeFunction
-              Effect: Allow
-              Resource: "*"
-        - PolicyName: LambdaAccessLambdaTrigger
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-            - Action:
-              - lambda:ListEventSourceMappings
-              Resource: "*"
-              Effect: Allow
-            - Action:
-              - lambda:UpdateEventSourceMapping
-              Resource: "*"
-              Effect: Allow
-        - PolicyName: LambdaAccessSns
-          PolicyDocument:
-            Statement:
-            - Action:
-              - sns:*
-              Effect: Allow
-              Resource: "*"
+#      ManagedPolicyArns:
+#        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+#        - arn:aws:iam::aws:policy/AWSLambdaExecute
+#        - arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess
+#        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+#        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+#      Policies:
+#        - PolicyName: LambdaAccessDynamo
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              - Effect: Allow
+#                Action:
+#                  - dynamodb:*
+#                Resource: !Sub 'arn:aws:dynamodb:eu-west-1:${AWS::AccountId}:table/online-classifieds-${Environment}'
+#        - PolicyName: LambdaAccessDynamoRead
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              - Effect: Allow
+#                Action:
+#                  - dynamodb:GetRecords
+#                  - dynamodb:GetShardIterator
+#                  - dynamodb:DescribeStream
+#                  - dynamodb:ListStreams
+#                Resource: "*"
+#        - PolicyName: LambdaStartExecution
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#              - Effect: Allow
+#                Action:
+#                  - states:StartExecution
+#                Resource: "*"
+#        - PolicyName: LambdaAccessSqs
+#          PolicyDocument:
+#            Statement:
+#            - Effect: Allow
+#              Action:
+#              - sqs:*
+#              Resource:
+#              - !Sub "arn:aws:sqs:eu-west-1:${AWS::AccountId}:resize-image-SQSCustomerReference-${Environment}"
+#        - PolicyName: LambdaAccessStepFunction
+#          PolicyDocument:
+#            Statement:
+#            - Action:
+#              - states:*
+#              Effect: Allow
+#              Resource: "*"
+#        - PolicyName: LambdaInvokeFunction
+#          PolicyDocument:
+#            Statement:
+#            - Action:
+#              - lambda:InvokeFunction
+#              Effect: Allow
+#              Resource: "*"
+#        - PolicyName: LambdaAccessLambdaTrigger
+#          PolicyDocument:
+#            Version: "2012-10-17"
+#            Statement:
+#            - Action:
+#              - lambda:ListEventSourceMappings
+#              Resource: "*"
+#              Effect: Allow
+#            - Action:
+#              - lambda:UpdateEventSourceMapping
+#              Resource: "*"
+#              Effect: Allow
+#        - PolicyName: LambdaAccessSns
+#          PolicyDocument:
+#            Statement:
+#            - Action:
+#              - sns:*
+#              Effect: Allow
+#              Resource: "*"
 ################################################
 # Lambda Role
 ################################################
@@ -412,7 +412,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
-        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+#        - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
       Policies:
         - PolicyName: LambdaAccessES
           PolicyDocument:
