@@ -1,5 +1,5 @@
 # https://github.com/serverless/examples
-service: resize-image-lambda-stack
+service: resize-image-lambda
 
 frameworkVersion: '=1.27'
 
