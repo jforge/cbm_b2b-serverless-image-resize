@@ -110,7 +110,7 @@ provider:
   environment:
     Environment: ${opt:stage}
     ALLOWED_RESOLUTIONS: 800x600
-    BUCKET: dev-vitrines-files
+    BUCKET: dev-vitrines-files-test
     URL: https://dev-vitrines-files.s3-eu-west-1.amazonaws.com
 
 functions:
