@@ -1,6 +1,6 @@
 # https://github.com/serverless/examples
 service: resize-image-lambda
-description: Lambda function to resize images for PDV (Point De Vente)
+description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
 
 custom:
@@ -106,7 +106,9 @@ provider:
   memorySize: 1536
   deploymentBucket: applications.${opt:stage}
   stackTags:
-    Enviro: ${opt:stage}
+    Environment: ${opt:stage}
+  environment:
+    Environment: ${opt:stage}
     ALLOWED_RESOLUTIONS: 800x600
     BUCKET: dev-vitrines-files
     URL: https://dev-vitrines-files.s3-eu-west-1.amazonaws.com
