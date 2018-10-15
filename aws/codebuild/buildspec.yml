@@ -6,6 +6,7 @@ phases:
       - yarn install
   build:
     commands:
+      - yarn sls:remove:$ENV
       - yarn sls:$ENV
 
 artifacts:

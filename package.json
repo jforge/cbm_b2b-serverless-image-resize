@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "commitmsg": "commitlint -E HUSKY_GIT_PARAMS",
+    "sls:remove:dev": "serverless remove --stage dev",
     "sls:dev": "serverless deploy --stage dev",
     "sls:dev:function": "serverless deploy function --stage dev",
     "sls:rec": "serverless deploy --stage rec",
