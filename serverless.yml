@@ -1,8 +1,19 @@
-service: ${self:custom.project.name}
+service: resize-image-lambda
+description: The AWS CF Serverless template for resize-image-${opt:stage}
+frameworkVersion: '=1.27'
 
 provider:
   name: aws
   runtime: nodejs8.10
+  region: eu-west-1
+  deploymentBucket: applications.${opt:stage}
+  stackTags:
+    Environment: ${opt:stage}
+  environment:
+    Environment: ${opt:stage}
+    ALLOWED_RESOLUTIONS: 800x600
+    BUCKET: dev-vitrines-files-test
+    URL: https://dev-vitrines-files.s3-eu-west-1.amazonaws.com
   iamRoleStatements:
   - Effect: "Allow"
     Action:
