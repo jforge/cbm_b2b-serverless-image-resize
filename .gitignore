@@ -74,3 +74,4 @@ typings/
 
 # IntelliJ directories
 .idea
+cbm_serverless-image-resize.iml
