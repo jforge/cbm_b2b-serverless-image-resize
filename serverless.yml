@@ -2,6 +2,102 @@ service: resize-image-lambda
 description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
 
+
+custom:
+  apiGatewayTags:
+#    TagBloc: classified
+#    TagApp: lcpab
+#    TagComp: resize-image
+    Env: ${opt:stage}
+#  deploymentSettings:
+#    codeDeployRole: arn:aws:iam::${self:custom.${opt:stage}.AccountId}:role/resize-image-codepipeline-codebuild-${opt:stage}
+  headers:
+  - Content-Type
+  - X-Amz-Date
+  - Authorization
+  - X-Api-Key
+  - X-Amz-Security-Token
+  - X-Amz-User-Agent
+  - Accept
+  - X-Client-Source
+  - Client-Type
+  dev:
+#    AccountId: 629307289374
+#    ApiKeyRecherche: hUfIdh82oY83kioJlhQMx6WqwgwLsZlt3Jy3eufd
+    CloudFrontCertificateArn: arn:aws:acm:us-east-1:629307289374:certificate/3c95042f-939e-4201-9938-6a216d9f784f
+    CloudFrontCnames:
+    - resize-image.dev.lacentrale.fr
+    CloudFrontViewerProtocolPolicy: allow-all
+#    CorsAllowedDomains: (https?://(.*)\.lacentrale\.(local|dev|fr)(:[0-9]+)?)|(http://static.cbm.dev.s3-website-eu-west-1.amazonaws.com)|(https?://dx9oyokjb8dhp.cloudfront.net)|(https?://(.*)\.carboat\.cloud(:[0-9]+)?)|(http://static.search-lc.dev.s3-website-eu-west-1.amazonaws.com)
+#    CorsMethods: GET, HEAD, OPTIONS
+#    DeploymentType: AllAtOnce
+#    ResizeImageESAliasName: resize-image
+#    ResizeImageESHost: https://search-classified-search-55-dev-cwwqfndfluge7l4xxytd3umu7a.eu-west-1.es.amazonaws.com
+#    ElasticSearchBulkSize: 1000
+#    OnlineClassifiedStreamArn: arn:aws:dynamodb:eu-west-1:629307289374:table/online-classifieds-dev/stream/2017-05-29T08:24:50.450
+#    ProGateAccountsHost: http://pro-gate.dev.carboat.cloud/v2/accounts
+#    RestrictedIPRanges: 176.67.93.64/28, 54.194.42.249/32, 192.168.0.0/16, 10.150.0.0/16
+    SecurityHeaderName: 82f9d9cbd7f34b12af3cd8c0292d9cbb
+    SecurityHeaderValue: lc
+#    Subnet1: subnet-faefa3a2
+#    Subnet2: subnet-5c242738
+#    Subnet3: subnet-a86869de
+#    SecurityGroup: sg-18d2cc65
+#    UrlApiRechercheAggregation: https://d4dtbucvucug2.cloudfront.net/v2/aggregations
+#    StatsBridgeLog: stats-logs-bridge-dev
+  rec:
+#    AccountId: 395174950964
+#    ApiKeyRecherche: U3TlVJIbHJ3oHuztPuOsF9RVtE7j3xAuqW5JkgH4
+    CloudFrontCertificateArn: arn:aws:acm:us-east-1:395174950964:certificate/7e7850b1-b051-4c27-833b-3d7c5f946eea
+    CloudFrontCnames:
+    - resize-image.rec.lacentrale.fr
+    CloudFrontViewerProtocolPolicy: redirect-to-https
+#    CorsAllowedDomains: (https?://(.*)\.lacentrale\.(rec|fr)(:[0-9]+)?)|(http://static.cbm.dev.s3-website-eu-west-1.amazonaws.com)|(http://static.search-lc.dev.s3-website-eu-west-1.amazonaws.com)
+#    CorsMethods: GET, HEAD, OPTIONS
+#    DeploymentType: AllAtOnce
+#    ResizeImageESAliasName: resize-image
+#    ResizeImageESHost: https://search-classified-search-55-rec-fuaxjqawgadnvjxebuxdhdmfry.eu-west-1.es.amazonaws.com
+#    ElasticSearchBulkSize: 1000
+#    OnlineClassifiedStreamArn: arn:aws:dynamodb:eu-west-1:395174950964:table/online-classifieds-rec/stream/2018-07-15T08:19:53.327
+#    ProGateAccountsHost: http://pro-gate.rec.carboat.cloud/v2/accounts
+#    RestrictedIPRanges: 176.67.93.64/28, 54.229.155.219/32, 192.168.0.0/16, 10.150.0.0/16
+    SecurityHeaderName: 82f9d9cbd7f34b12af3cd8c0292d9cbb
+    SecurityHeaderValue: lc
+#    Subnet1: subnet-b3054deb
+#    Subnet2: subnet-34ddd150
+#    Subnet3: subnet-5bdbd92d
+#    SecurityGroup: sg-f053e88c
+#    UrlApiRechercheAggregation: https://dp8ybqeftnlcz.cloudfront.net/v2/aggregations
+#    StatsBridgeLog: stats-logs-bridge-rec
+  prod:
+#    AccountId: 395174950964
+#    ApiKeyRecherche: 2vHD2GjDJ07RpNvbGYpJG7s6bQNwRNkI9SEkgQnR
+    CloudFrontCertificateArn: arn:aws:acm:us-east-1:395174950964:certificate/dd6fab5e-2141-4665-8b49-c3700a8aec33
+    CloudFrontCnames:
+    - resize-image.lacentrale.fr
+    CloudFrontViewerProtocolPolicy: redirect-to-https
+#    CorsAllowedDomains: (https?://(.*)\.lacentrale\.fr)|(http://static.cbm.dev.s3-website-eu-west-1.amazonaws.com)|(http://static.search-lc.dev.s3-website-eu-west-1.amazonaws.com)
+#    CorsMethods: GET, HEAD, OPTIONS
+#    DeploymentType: Canary10Percent5Minutes
+#    ResizeImageESAliasName: resize-image
+#    ResizeImageESHost: https://search-classified-search-55-prod-ej3ij3wcaxj2a2ivi2zzrpplje.eu-west-1.es.amazonaws.com
+#    ElasticSearchBulkSize: 1000
+#    OnlineClassifiedStreamArn: arn:aws:dynamodb:eu-west-1:395174950964:table/online-classifieds-prod/stream/2018-04-17T09:30:22.631
+#    ProGateAccountsHost: http://pro-gate.prod.carboat.cloud/v2/accounts
+#    RestrictedIPRanges: 176.67.93.64/28, 54.229.58.235/32, 192.168.0.0/16, 10.150.0.0/16
+    SecurityHeaderName: 82f9d9cbd7f34b12af3cd8c0292d9cbb
+    SecurityHeaderValue: lc
+#    Subnet1: subnet-6ec38936
+#    Subnet2: subnet-6b050c0f
+#    Subnet3: subnet-74c5ca02
+#    SecurityGroup: sg-0e41ff93cd41089fd
+#    UrlApiRechercheAggregation: https://d1n01i0y91eyf4.cloudfront.net/v2/aggregations
+#    StatsBridgeLog: stats-logs-bridge-prod
+
+
+
+
+
 provider:
   name: aws
   runtime: nodejs8.10
