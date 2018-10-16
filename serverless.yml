@@ -46,7 +46,6 @@ provider:
         - "dev-vitrines-files"
         - "/*"
 
-
 #plugins:
 #- serverless-webpack
 
