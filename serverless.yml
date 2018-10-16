@@ -68,3 +68,110 @@ functions:
 #    - s3:
 #        bucket: "dev-vitrines-files"
 #        event: s3:ObjectCreated:*
+
+
+resources:
+  Resources:
+    ResizeImageCloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Aliases: ${self:custom.${opt:stage}.CloudFrontCnames}
+          CacheBehaviors:
+          - TargetOriginId: resize-image-apigateway-${opt:stage}
+            PathPattern: '/v1/resize-image'
+            SmoothStreaming: 'false'
+            AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            Compress: 'true'
+            MinTTL: '0'
+            MaxTTL: '300'
+            DefaultTTL: '300'
+            ForwardedValues:
+              QueryString: 'true'
+              Cookies:
+                Forward: none
+              Headers:
+              - X-Api-Key
+              - Origin
+              - X-Client-Source
+              - Client-Type
+            ViewerProtocolPolicy: ${self:custom.${opt:stage}.CloudFrontViewerProtocolPolicy}
+          Comment: { Fn::Join : [ ",", "${self:custom.${opt:stage}.CloudFrontCnames}" ] }
+          CustomErrorResponses:
+          - ErrorCode: '400'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '403'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '404'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '500'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '502'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '503'
+            ErrorCachingMinTTL: '0'
+          - ErrorCode: '504'
+            ErrorCachingMinTTL: '0'
+          DefaultCacheBehavior:
+            TargetOriginId: resize-image-apigateway-${opt:stage}
+            SmoothStreaming: 'false'
+            AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            Compress: 'true'
+            MinTTL: '0'
+            MaxTTL: '300'
+            DefaultTTL: '300'
+            ForwardedValues:
+              QueryString: 'true'
+              Cookies:
+                Forward: none
+              Headers:
+              - X-Api-Key
+              - Origin
+              - X-Client-Source
+              - Client-Type
+            ViewerProtocolPolicy: ${self:custom.${opt:stage}.CloudFrontViewerProtocolPolicy}
+          Enabled: 'true'
+          HttpVersion: http1.1
+          Logging:
+            Bucket: log-cloudfront.${opt:stage}.s3.amazonaws.com
+            IncludeCookies: false
+            Prefix: resize-image
+          Origins:
+          - DomainName: { Fn::Join : [ "", [ "Ref" : "ApiGatewayRestApi", ".execute-api.eu-west-1.amazonaws.com" ] ] }
+            OriginPath: /${opt:stage}
+            OriginCustomHeaders:
+            - HeaderName: ${self:custom.${opt:stage}.SecurityHeaderName}
+              HeaderValue: ${self:custom.${opt:stage}.SecurityHeaderValue}
+            Id: resize-image-apigateway-${opt:stage}
+            CustomOriginConfig:
+              HTTPPort: '80'
+              HTTPSPort: '443'
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 10
+              OriginSSLProtocols:
+              - TLSv1
+              - TLSv1.1
+              - TLSv1.2
+          PriceClass: PriceClass_100
+          ViewerCertificate:
+            AcmCertificateArn: ${self:custom.${opt:stage}.CloudFrontCertificateArn}
+            SslSupportMethod: sni-only
+        Tags:
+        - Key: Comp
+          Value: resize-image
+        - Key: Env
+          Value: ${opt:stage}
