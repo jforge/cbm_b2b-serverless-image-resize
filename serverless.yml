@@ -65,7 +65,7 @@ functions:
     memorySize: 1024
     timeout: 30
     handler: index.handler
-    events:
-    - s3:
-        bucket: "dev-vitrines-files"
-        event: s3:ObjectCreated:*
+#    events:
+#    - s3:
+#        bucket: "dev-vitrines-files"
+#        event: s3:ObjectCreated:*
