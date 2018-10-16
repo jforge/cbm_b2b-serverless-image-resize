@@ -34,13 +34,10 @@ provider:
       - - "arn:aws:s3:::"
         - "dev-vitrines-files"
         - "/*"
-  - Effect: "Allow"
-    Action:
-    - rekognition:DetectFaces
 
 
-plugins:
-- serverless-webpack
+#plugins:
+#- serverless-webpack
 
 package:
   exclude:
