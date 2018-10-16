@@ -59,7 +59,8 @@ package:
   - serverless.yml
 
 functions:
-  sharpImage:
+  ResizeImage:
+    name: resize-image-${opt:stage}-ResizeImage
     description: Resizes images
     memorySize: 1024
     timeout: 30
