@@ -149,7 +149,7 @@ Resources:
           - Action:
             - lambda:*
             Effect: Allow
-            Resource: !Join ["", ["arn:aws:lambda:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":function:resize-image-", !Ref Environment, "*"]]
+            Resource: !Join ["", ["arn:aws:lambda:", !Ref "AWS::Region", ":", !Ref "AWS::AccountId", ":function:resize-image-lambda", !Ref Environment, "*"]]
           - Action:
             - lambda:CreateEventSourceMapping
             - lambda:Get*
