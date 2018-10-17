@@ -47,9 +47,21 @@ package:
   exclude:
   - .serverless
   - .gitignore
+  - Architecture.png
+  - aws
+  - cbm_serverless-image-resize.iml
+  - diagram.svg
+#  - node_modules
   - package.json
+  - serverless-2010-09-09.yml
   - README.md
+  - buildspec.yml
+  - commitlint.config.js
+#  - index.js
+  - package-lock.json
+  - sequenceDiagram
   - serverless.yml
+
 
 functions:
   ResizeImage:

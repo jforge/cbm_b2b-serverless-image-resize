@@ -124,7 +124,7 @@ Select the Bucket > Properties > Static website hosting > Use this bucket to hos
 ```
 
 
-## Test 
+## Test via Lambda
 
 You can use this Test Event to test this lambda function:
 EventResizeTest = 
@@ -136,13 +136,22 @@ EventResizeTest =
 }
 ```
 
+## Test via ApiGateway
+```
+key=800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg
+```
 
-Test KO : https://s3-eu-west-1.amazonaws.com/dev-vitrines-files/C800x600/000064/1b8d23ad3aacf8752bd72192123573fb.jpg
+## Test via S3
 
-Test OK : http://dev-vitrines-files.s3-website-eu-west-1.amazonaws.com/800x600/C000064/1b8d23ad3aacf8752bd72192123573fb.jpg
-
-This test will create the new sized image in new folder "800x600" .
-
+Delete folder "800x600" from  AWS S3 Dev, Bucket=dev-vitrines-files
+When you try to get :
+```
+http://dev-vitrines-files.s3-website-eu-west-1.amazonaws.com/800x600/C043286/C043286_1532682815543.jpg
+```
+S3 will redirect to
+```
+https://dev-vitrines-files.s3-eu-west-1.amazonaws.com/800x600/C043286/C043286_1532682815543.jpg
+```
 
 ## Links
 
