@@ -50,14 +50,43 @@ And state what happens step-by-step.
 
 ## Deploying / Publishing
 
-- Create the package :
+- Delete previous serverless stack (if needed) :
 ```shell
-rm -rf ../dev-lambda-resize-image.zip && zip -r ../dev-lambda-resize-image.zip *
+export AWS_PROFILE=cbm_your_profile_if_not_default
+yarn sls:remove:dev
 ```
-- Upload to S3 (it will be used as source for Lambda :
+
+( It will delete the S3 source from Amazon S3:/applications.dev/resize-image-codepip/SourceOutp )
+
+- Delete previous CloudFormation stack (if needed) :
 ```shell
-aws s3 cp ../dev-lambda-resize-image.zip s3://dev-vitrines-files/dev-lambda-resize-image.zip
+aws cloudformation delete-stack --region eu-west-1 --stack-name resize-image-codepipeline-stack-dev
 ```
+
+- Create CloudFormation stack :
+```shell
+aws cloudformation create-stack --stack-name resize-image-codepipeline-stack-dev --region eu-west-1 --template-body file://aws/cloudformation/cf-resize-image-codepipeline.yml --capabilities CAPABILITY_NAMED_IAM
+```
+
+- OR Update CloudFormation stack (then retry pipeline if needed):
+```shell
+aws cloudformation update-stack --stack-name resize-image-codepipeline-stack-dev --region eu-west-1 --template-body file://aws/cloudformation/cf-resize-image-codepipeline.yml --capabilities CAPABILITY_NAMED_IAM
+```
+
+- Manually link Github to AWS via the interface: 
+
+code pipeline > edit > edit stage (source github) > edit (icon) >  connect to github
+Once authenticated, fill in the repository, project and branch names, then choose the "webhook" mode in the change detection options
+Done (Stage) > Save (Pipeline) > Release change
+
+
+- Validate CloudFormation stack (if needed) :
+```shell
+aws cloudformation validate-template --region eu-west-1 --template-body file://aws/cloudformation/cf-resize-image-codepipeline.yml
+```
+
+
+
 
 ## Configuration / Parameters
 
@@ -155,4 +184,5 @@ https://dev-vitrines-files.s3-eu-west-1.amazonaws.com/800x600/C043286/C043286_15
 
 ## Links
 
-TODO : link to NEO.
+NEO :
+https://noe.carboatmedia.fr/display/dev/Redimensionnement+des+images+PDV
