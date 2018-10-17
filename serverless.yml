@@ -26,6 +26,7 @@ provider:
     ALLOWED_RESOLUTIONS: 800x600
     BUCKET: ${opt:stage}-vitrines-files
     URL: https://${opt:stage}-vitrines-files.s3-eu-west-1.amazonaws.com
+    VERSION : 1
   iamRoleStatements:
   - Effect: "Allow"
     Action:

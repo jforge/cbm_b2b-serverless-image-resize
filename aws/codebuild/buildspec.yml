@@ -6,8 +6,8 @@ phases:
       - yarn install
   build:
     commands:
-      - yarn sls:remove:$ENV
-      - export SLS_DEBUG=true
+#      - yarn sls:remove:$ENV
+      - export SLS_DEBUG=false
       - yarn sls:$ENV
 
 artifacts:
