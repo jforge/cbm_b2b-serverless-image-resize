@@ -21,7 +21,7 @@ provider:
   deploymentBucket: applications.${opt:stage}
   stackTags:
     EnvironmentTag: ${opt:stage}
-    VersionTag: 1
+    VersionTag: "1.0"
   environment:
     Environment: ${opt:stage}
     ALLOWED_RESOLUTIONS: 800x600

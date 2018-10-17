@@ -9,7 +9,7 @@ This project is used as a Lambda function to resizes existing images in Amazon S
 When a targeted image size is not found in S3, a redirection rules calls the Amazon API Gateway which integrated with this Lambda to create the requested size.
 The next request for the resized image will be served from S3 directly.
 
-More info : TODO : Neo link
+More info : Noe https://noe.carboatmedia.fr/display/dev/Redimensionnement+des+images+PDV
 
 ![Sequence Diagram](./Architecture.png)
 
