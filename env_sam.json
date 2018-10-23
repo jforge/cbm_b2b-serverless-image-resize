@@ -1,0 +1,5 @@
+{
+  "ResizeImageLambda" : {
+    "BUCKET": "dev-vitrines-files"
+  }
+}

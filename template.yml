@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: My first serverless application.
+
+Resources:
+
+  ResizeImageLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs8.10
+      Environment:
+        Variables:
+          BUCKET:
+            Ref: CustomImageBucket
+          ALLOWED_RESOLUTIONS:
+            Ref: CustomAllowedResolutions
+          URL:
+            Ref: CustomURL
+      Events:
+        ResizeImageApi:
+          Type: Api
+          Properties:
+            Path: /v1/resize-image
+            Method: get
+
