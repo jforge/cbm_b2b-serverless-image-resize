@@ -184,8 +184,11 @@ https://dev-vitrines-files.s3-eu-west-1.amazonaws.com/800x600/C043286/C043286_15
 
 ## Test via SAM
 `sam local invoke "ResizeImageLambda" --env-vars env_sam.json -e event_apigateway.json`
+
 `sam local generate-event apigateway aws-proxy > event_apigateway.json`
+
 `sam local invoke "ResizeImageLambda" --env-vars env_sam.json -e event_apigateway.json`
+
 `sam local invoke "ResizeImageLambda" --env-vars env_sam.json -e event_apigateway.json -d 5858 --debug`
 
 ## Links
