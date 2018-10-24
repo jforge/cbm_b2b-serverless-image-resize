@@ -11,10 +11,11 @@ exports.handler = function (event, context, callback) {
   let resizedImgPath;
   // extract info from event
   if (queryStringParameters && queryStringParameters.key && queryStringParameters.key !== "") {
-    console.info("call from API Gateway");
     resizedImgPath = queryStringParameters.key;
+    console.info("call from API Gateway");
   } else if (Records && Records !== "") {
     console.info("call from s3 bucket");
+    console.log("event", JSON.stringify(event, null, 2));
     if (event.Records[0].s3.object.key.startsWith("800x600")) {
       return;
     }
@@ -31,12 +32,17 @@ exports.handler = function (event, context, callback) {
     });
     return;
   }
-
   // extract info from route params
-  const match = resizedImgPath.match(/((\d+)x(\d+))\/(.*)/);
-  const width = parseInt(match[2], 10);
-  const height = parseInt(match[3], 10);
-  const originalImgPath = match[4];
+  const match = resizedImgPath.match(/(\w+)\/?(\D*)\/(\d+)x(\d+)\/(\S+)/);
+  const folder = match[2] === '' ? match[1] : `${match[1]}/${match[2]}`;
+  const width = parseInt(match[3], 10);
+  const height = parseInt(match[4], 10);
+  const file = match[5];
+  const originalImgPath = `${folder}/${file}`;
+  console.log("originalImgPath =>", originalImgPath);
+  console.log("wanted width =>", width);
+  console.log("wanted height =>", height);
+  console.log("resizedImgPath =>", resizedImgPath);
 
   // prevent resizing for not supported resolutions
   if (0 !== ALLOWED_RESOLUTIONS.size && !ALLOWED_RESOLUTIONS.has(match[1])) {
