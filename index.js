@@ -7,12 +7,12 @@ const URL = process.env.URL;
 const ALLOWED_RESOLUTIONS = process.env.ALLOWED_RESOLUTIONS ? new Set(process.env.ALLOWED_RESOLUTIONS.split(/\s*,\s*/)) : new Set([]);
 
 exports.handler = function (event, context, callback) {
-  const { queryStringParameters, Records } = event;
+  const {queryStringParameters, Records} = event;
   let resizedImgPath;
   // extract info from event
   if (queryStringParameters && queryStringParameters.key && queryStringParameters.key !== "") {
     resizedImgPath = queryStringParameters.key;
-    console.info("call from API Gateway");
+    console.info("call from API Gateway", resizedImgPath);
   } else if (Records && Records !== "") {
     console.info("call from s3 bucket");
     console.log("event", JSON.stringify(event, null, 2));
@@ -20,9 +20,13 @@ exports.handler = function (event, context, callback) {
       return;
     }
     let path = Records[0].s3.object.key;
-    let folder = path.substring(0,path.indexOf('/'));
-    let img = path.substring(path.length,path.indexOf('/'));
+    console.log("call from s3, path", path);
+    let folder = path.substring(0, path.indexOf('/'));
+    console.log("call from s3, folder", folder);
+    let img = path.substring(path.length, path.indexOf('/'));
+    console.log("call from s3, img", img);
     resizedImgPath = `${folder}/800x600/${img}`;
+    console.log("call from s3, resizedImgPath", resizedImgPath);
   } else {
     console.error("can't extract info from payload, returning 403");
     callback(null, {
@@ -39,13 +43,18 @@ exports.handler = function (event, context, callback) {
   const height = parseInt(match[4], 10);
   const file = match[5];
   const originalImgPath = `${folder}/${file}`;
+  const resolution = `${width}x${height}`;
+  console.log(match);
   console.log("originalImgPath =>", originalImgPath);
   console.log("wanted width =>", width);
   console.log("wanted height =>", height);
   console.log("resizedImgPath =>", resizedImgPath);
+  console.log("resolution =>", resolution);
+  console.log("ALLOWED_RESOLUTIONS =>", ALLOWED_RESOLUTIONS);
+  console.log("ALLOWED_RESOLUTIONS.has(resolution) =>", ALLOWED_RESOLUTIONS.has(resolution));
 
   // prevent resizing for not supported resolutions
-  if (0 !== ALLOWED_RESOLUTIONS.size && !ALLOWED_RESOLUTIONS.has(match[1])) {
+  if (0 !== ALLOWED_RESOLUTIONS.size && !ALLOWED_RESOLUTIONS.has(resolution)) {
     console.warn(`wanted resolution ${match[1]} is not allowed`);
     callback(null, {
       statusCode: '403',
