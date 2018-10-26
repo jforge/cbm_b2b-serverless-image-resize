@@ -5,8 +5,8 @@ Inspired by : https://aws.amazon.com/fr/blogs/compute/resize-images-on-the-fly-w
 
 # Description
 
-This project is used as a Lambda function to resizes existing images in Amazon S3.
-When a targeted image size is not found in S3, a redirection rules calls the Amazon API Gateway which integrated with this Lambda to create the requested size.
+This project is used as a Lambda function to resize existing images in Amazon S3.
+When a targeted image resolution is not found in S3, a redirection rule on the S3 calls the Amazon API Gateway which calls  this Lambda to resize the image.
 The next request for the resized image will be served from S3 directly.
 
 More info : TODO : Neo link
@@ -46,16 +46,35 @@ rm -rf node_modules/ && npm i && exit
 
 And state what happens step-by-step.
 
+
+## Local testing with SAM 
+Prerequisites : 
+- [sam-cli](https://github.com/awslabs/aws-sam-cli/blob/develop/docs/installation.rst)
+
+Then, to run the lambda locally :
+- run lambda from ApiGateway event :
+
+`sam local invoke "ResizeImageLambda" --env-vars env_sam.json -e event_apigateway.json` 
+
+- run lambda from s3 event :
+ 
+ ```sam local invoke "ResizeImageLambda" --env-vars env_sam.json -e event_s3_put.json``` 
+
+It will call the lambda with environment variables provided by `env_sam.json` && event provided by `event_apigateway.json` 
 ## Deploying / Publishing
 
+CodePipeline will deploy the Lambda on every push event, just commit your changes & push.
+
+or 
+
+
 - Create the package :
-```shell
-rm -rf ../dev-lambda-resize-image.zip && zip -r ../dev-lambda-resize-image.zip *
-```
-- Upload to S3 (it will be used as source for Lambda :
-```shell
-aws s3 cp ../dev-lambda-resize-image.zip s3://dev-vitrines-files/dev-lambda-resize-image.zip
-```
+
+```rm -rf ../dev-lambda-resize-image.zip && zip -r ../dev-lambda-resize-image.zip *```
+
+- Upload it to S3 (it will be used as source for Lambda) :
+
+```aws s3 cp ../dev-lambda-resize-image.zip s3://dev-vitrines-files/dev-lambda-resize-image.zip```
 
 ## Configuration / Parameters
 
