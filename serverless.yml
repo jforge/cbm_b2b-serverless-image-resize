@@ -87,7 +87,7 @@ resources:
     ImageBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${opt:stage}-vitrines-files
+        BucketName: ${opt:stage}-vitrines-files-cf
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
