@@ -82,20 +82,20 @@ functions:
           headers: ${self:custom.headers}
           allowCredentials: false
 
-#resources:
-#  Resources:
-#    ImageBucket:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: ${opt:stage}-vitrines-files
-#        AccessControl: PublicRead
-#        WebsiteConfiguration:
-#          IndexDocument: index.html
-#          RoutingRules:
-#          - RedirectRule:
-#              HostName: foo.amazonaws.com
-#              HttpRedirectCode: "307"
-#              Protocol: https
-#              ReplaceKeyPrefixWith: dev/v1/resize-image?key=
-#            RoutingRuleCondition:
-#              HttpErrorCodeReturnedEquals: "404"
+resources:
+  Resources:
+    ImageBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${opt:stage}-vitrines-files
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          RoutingRules:
+          - RedirectRule:
+              HostName: foo.amazonaws.com
+              HttpRedirectCode: "307"
+              Protocol: https
+              ReplaceKeyPrefixWith: dev/v1/resize-image?key=
+            RoutingRuleCondition:
+              HttpErrorCodeReturnedEquals: "404"
