@@ -66,25 +66,6 @@ package:
   - sequenceDiagram
   - serverless.yml
 
-
-functions:
-  ResizeImage:
-    name: resize-image-lambda-${opt:stage}
-    description: Resizes images
-    memorySize: 1024
-    timeout: 30
-    handler: index.handler
-    events:
-    - http:
-        path: /v1/resize-image
-        method: GET
-        private: true
-        cors:
-          origins:
-          - '*'
-          headers: ${self:custom.headers}
-          allowCredentials: false
-
 resources:
   Resources:
     ImageBucket:
@@ -95,7 +76,7 @@ resources:
         NotificationConfiguration:
           LambdaConfigurations:
             - Event: 's3:ObjectCreated:*'
-              Function: !GetAtt [ ResizeImage, Arn ]
+              Function: !GetAtt ResizeImage.Arn
 #                'Fn::GetAtt': [ ResizeImage, Arn ]
 #               'Fn::GetAtt': [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
@@ -109,3 +90,19 @@ resources:
               ReplaceKeyPrefixWith: dev/v1/resize-image?key=
             RoutingRuleCondition:
               HttpErrorCodeReturnedEquals: "404"
+    ResizeImage:
+      name: resize-image-lambda-${opt:stage}
+      description: Resizes images
+      memorySize: 1024
+      timeout: 30
+      handler: index.handler
+      events:
+      - http:
+          path: /v1/resize-image
+          method: GET
+          private: true
+          cors:
+            origins:
+            - '*'
+            headers: ${self:custom.headers}
+            allowCredentials: false
