@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     commands:
-      - yarn install
+#      - yarn install
   build:
     commands:
 #      - yarn sls:remove:$ENV
