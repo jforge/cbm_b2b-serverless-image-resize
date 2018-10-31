@@ -75,7 +75,7 @@ functions:
     - http:
         path: /v1/resize-image
         method: GET
-        private: false
+        private: true
         cors:
           origins:
           - '*'
@@ -93,8 +93,8 @@ resources:
           IndexDocument: index.html
           RoutingRules:
           - RedirectRule:
-              # HostName: { Fn::Join : [ "", [ "Ref" : "ApiGatewayRestApi", ".execute-api.eu-west-1.amazonaws.com" ] ] }
-              HostName: 7i8iyjew03.execute-api.eu-west-1.amazonaws.com
+              HostName: { Fn::Join : [ "", [ "Ref" : "ApiGatewayRestApi", ".execute-api.eu-west-1.amazonaws.com" ] ] }
+              # HostName: 7i8iyjew03.execute-api.eu-west-1.amazonaws.com
               HttpRedirectCode: "307"
               Protocol: https
               ReplaceKeyPrefixWith: dev/v1/resize-image?key=
