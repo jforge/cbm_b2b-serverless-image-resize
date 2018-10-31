@@ -122,4 +122,4 @@ resources:
           "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
         Action: "lambda:InvokeFunction"
         Principal: "s3.amazonaws.com"
-        SourceArn: { "Fn::GetAtt" : ImageBucket }
+        SourceArn: { "Fn::GetAtt" : [ ImageBucket, Arn ] }
