@@ -95,11 +95,10 @@ resources:
         NotificationConfiguration:
           LambdaConfigurations:
           - Event: 's3:ObjectCreated:*'
-            Function:
-              "Fn::GetAtt": [ ResizeImage, Arn ]
-          - Event: 's3:ObjectDelete:*'
-            Function:
-              "Fn::GetAtt": [ ResizeImage, Arn ]
+            Function: !Ref ResizeImage
+#          - Event: 's3:ObjectDelete:*'
+#            Function:
+#              "Fn::GetAtt": [ ResizeImage, Arn ]
         WebsiteConfiguration:
           IndexDocument: index.html
           RoutingRules:
