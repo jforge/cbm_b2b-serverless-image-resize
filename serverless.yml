@@ -42,9 +42,9 @@ provider:
       Fn::Join:
       - ""
       - - "arn:aws:s3:::"
-        - ${opt:stage}
-        - "-"
         - ${self:custom.bucketname}
+        - "-"
+        - ${opt:stage}
         - "/*"
 
 #plugins:
@@ -103,7 +103,6 @@ resources:
 #          - Event: 's3:ObjectDelete:*'
 #            Function:
 #              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
-#          - Event: 's3:ObjectDelete:*'
         WebsiteConfiguration:
           IndexDocument: index.html
           RoutingRules:
