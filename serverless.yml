@@ -66,7 +66,7 @@ package:
 
 functions:
   ResizeImage:
-    name: resize-image-lambda-${opt:stage}-ResizeImage
+    name: resize-image-lambda-${opt:stage}
     description: Resizes images
     memorySize: 1024
     timeout: 30
