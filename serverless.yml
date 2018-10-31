@@ -96,10 +96,9 @@ resources:
           LambdaConfigurations:
             - Event: 's3:ObjectCreated:*'
               Function:
-                'Fn::GetAtt': [ ResizeImageLambdaFunction, Arn ]
+                'Fn::GetAtt': [ ResizeImage, Arn ]
+#               'Fn::GetAtt': [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
-#            Function:
-#              "Fn::GetAtt": [ ResizeImage, Arn ]
         WebsiteConfiguration:
           IndexDocument: index.html
           RoutingRules:
