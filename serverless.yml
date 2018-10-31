@@ -1,3 +1,5 @@
+# https://github.com/serverless/serverless/issues/2967
+
 service: resize-image-lambda
 description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
@@ -120,4 +122,4 @@ resources:
           "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
         Action: "lambda:InvokeFunction"
         Principal: "s3.amazonaws.com"
-        SourceArn: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ImageBucket" } ] ] }
+        SourceArn: { "Fn::GetAtt" : ImageBucket }
