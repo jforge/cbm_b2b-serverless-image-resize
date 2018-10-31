@@ -95,12 +95,10 @@ Resources:
             - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/*']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment', '/*']]
-#          - Effect: Allow
-#            Action:
-#            - s3:PutObject
-#            - s3:GetObject
-#            - s3:GetObjectVersion
-#            - s3:ListBucket
+          - Effect: Allow
+            Action:
+            - s3:*
+            Resource: "*"
 #            Resource:
 #            - !Join ['', ['arn:aws:s3:::assets.lacentrale.', !Ref 'Environment', '/*']]
           - Effect: Allow

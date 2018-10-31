@@ -3,7 +3,7 @@ description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
 
 custom:
-  bucketname: 'vitrines-files-cf'
+  bucketname: "vitrines-files-cf"
   headers:
   - Content-Type
   - X-Amz-Date
@@ -92,12 +92,15 @@ resources:
       Properties:
         BucketName: ${self:custom.bucketname}-${opt:stage}
         AccessControl: PublicRead
+        NotificationConfiguration:
+          LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Function: !GetAtt ResizeImage.Arn
         WebsiteConfiguration:
           IndexDocument: index.html
           RoutingRules:
           - RedirectRule:
               HostName: { Fn::Join : [ "", [ "Ref" : "ApiGatewayRestApi", ".execute-api.eu-west-1.amazonaws.com" ] ] }
-              # HostName: 7i8iyjew03.execute-api.eu-west-1.amazonaws.com
               HttpRedirectCode: "307"
               Protocol: https
               ReplaceKeyPrefixWith: dev/v1/resize-image?key=
