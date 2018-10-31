@@ -95,8 +95,9 @@ Resources:
             - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/*']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment', '/*']]
-#          - Effect: Allow
-#            Action:
+          - Effect: Allow
+            Action:
+            - s3:CreateBucket
 #            - s3:PutObject
 #            - s3:GetObject
 #            - s3:GetObjectVersion
