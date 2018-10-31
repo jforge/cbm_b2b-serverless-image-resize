@@ -94,11 +94,12 @@ resources:
         AccessControl: PublicRead
         NotificationConfiguration:
           LambdaConfigurations:
-            - Event: 's3:ObjectCreated:*'
-              Function:
-                "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
-#                'Fn::GetAtt': [ ResizeImage, Arn ]
-#               'Fn::GetAtt': [ ResizeImageLambdaFunction, Arn ]
+          - Event: 's3:ObjectCreated:*'
+            Function:
+              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
+          - Event: 's3:ObjectDelete:*'
+            Function:
+              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
         WebsiteConfiguration:
           IndexDocument: index.html
@@ -119,5 +120,4 @@ resources:
           "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
         Action: "lambda:InvokeFunction"
         Principal: "s3.amazonaws.com"
-        SourceArn: "arn:aws:s3:::*"
-        
+        SourceArn: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ImageBucket" } ] ] }
