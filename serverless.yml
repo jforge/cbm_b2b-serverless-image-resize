@@ -110,3 +110,14 @@ resources:
               ReplaceKeyPrefixWith: dev/v1/resize-image?key=
             RoutingRuleCondition:
               HttpErrorCodeReturnedEquals: "404"
+    ResizeImageLambdaPermissionBucketS3:
+      DependsOn:
+      - ResizeImageLambdaFunction
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName:
+          "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
+        Action: "lambda:InvokeFunction"
+        Principal: "s3.amazonaws.com"
+        SourceArn: "arn:aws:s3:::*"
+        
