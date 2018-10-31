@@ -3,8 +3,8 @@ description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
 
 custom:
-  bucket-name:
-  - "vitrines-files-cf"
+  bucketname:
+  - 'vitrines-files-cf'
   headers:
   - Content-Type
   - X-Amz-Date
@@ -27,8 +27,8 @@ provider:
   environment:
     Environment: ${opt:stage}
     ALLOWED_RESOLUTIONS: 800x600
-    BUCKET: ${self:custom.bucket-name}-${opt:stage}
-    URL: https://${self:custom.bucket-name}-${opt:stage}.s3-eu-west-1.amazonaws.com
+    BUCKET: ${self:custom.bucketname}-${opt:stage}
+    URL: https://${self:custom.bucketname}-${opt:stage}.s3-eu-west-1.amazonaws.com
   iamRoleStatements:
   - Effect: "Allow"
     Action:
@@ -42,7 +42,7 @@ provider:
       - - "arn:aws:s3:::"
         - ${opt:stage}
         - "-"
-        - ${self:custom.bucket-name}
+        - ${self:custom.bucketname}
         - "/*"
 
 #plugins:
@@ -91,7 +91,7 @@ resources:
     ImageBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucket-name}-${opt:stage}
+        BucketName: ${self:custom.bucketname}-${opt:stage}
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
