@@ -66,6 +66,25 @@ package:
   - sequenceDiagram
   - serverless.yml
 
+
+#functions:
+#  ResizeImage:
+#    name: resize-image-lambda-${opt:stage}
+#    description: Resizes images
+#    memorySize: 1024
+#    timeout: 30
+#    handler: index.handler
+#    events:
+#    - http:
+#        path: /v1/resize-image
+#        method: GET
+#        private: true
+#        cors:
+#          origins:
+#          - '*'
+#          headers: ${self:custom.headers}
+#          allowCredentials: false
+
 resources:
   Resources:
     ImageBucket:
@@ -91,18 +110,22 @@ resources:
             RoutingRuleCondition:
               HttpErrorCodeReturnedEquals: "404"
     ResizeImage:
-      name: resize-image-lambda-${opt:stage}
-      description: Resizes images
-      memorySize: 1024
-      timeout: 30
-      handler: index.handler
-      events:
-      - http:
-          path: /v1/resize-image
-          method: GET
-          private: true
-          cors:
-            origins:
-            - '*'
-            headers: ${self:custom.headers}
-            allowCredentials: false
+      Type: AWS::Lambda::Function
+      Properties:
+        Handler: index.handler
+        Runtime: nodejs8.10
+        Environment:
+          Variables:
+            BUCKET:
+              Ref: CustomImageBucket
+            ALLOWED_RESOLUTIONS:
+              Ref: CustomAllowedResolutions
+            URL:
+              Ref: CustomURL
+        Events:
+          ResizeImageApi:
+            Type: Api
+            Properties:
+              Path: /v1/resize-image
+              Method: GET
+              Private: true
