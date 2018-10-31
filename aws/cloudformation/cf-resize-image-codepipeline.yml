@@ -95,9 +95,8 @@ Resources:
             - !Join ['', ['arn:aws:s3:::applications.', !Ref 'Environment', '/*']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment']]
 #            - !Join ['', ['arn:aws:s3:::log-cloudfront.', !Ref 'Environment', '/*']]
-          - Effect: Allow
-            Action:
-            - s3:CreateBucket
+#          - Effect: Allow
+#            Action:
 #            - s3:PutObject
 #            - s3:GetObject
 #            - s3:GetObjectVersion
@@ -109,7 +108,7 @@ Resources:
             - logs:*
             Resource:
             - !Join ['', ['arn:aws:logs:', !Ref 'AWS::Region', ':', !Ref 'AWS::AccountId' , ':log-group:/aws/codebuild/*' ]]
-            - !Join ["", ["arn:aws:logs:", !Ref "AWS::Region",":", !Ref "AWS::AccountId",":", "log-group:/aws/lambda/resize-image-lambda-", !Ref Environment,"-*:*"]]
+            - !Join ["", ["arn:aws:logs:", !Ref "AWS::Region",":", !Ref "AWS::AccountId",":", "log-group:/aws/lambda/resize-image-lambda-", !Ref Environment,":*"]]
           - Effect: "Allow"
             Action:
             - logs:Describe*
