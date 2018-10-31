@@ -3,8 +3,7 @@ description: The AWS CF Serverless template for resize-image-${opt:stage}
 frameworkVersion: '=1.27'
 
 custom:
-  bucketname:
-  - 'vitrines-files-cf'
+  bucketname: 'vitrines-files-cf'
   headers:
   - Content-Type
   - X-Amz-Date
