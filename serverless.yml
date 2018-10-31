@@ -99,9 +99,9 @@ resources:
           - Event: 's3:ObjectCreated:*'
             Function:
               "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
-          - Event: 's3:ObjectDelete:*'
-            Function:
-              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
+#          - Event: 's3:ObjectDelete:*'
+#            Function:
+#              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
         WebsiteConfiguration:
           IndexDocument: index.html
@@ -123,4 +123,4 @@ resources:
         Action: "lambda:InvokeFunction"
         Principal: "s3.amazonaws.com"
 #        SourceArn: { "Fn::GetAtt" : [ ImageBucket, Arn ] }
-        SourceArn: "arn:aws:s3::"${self:custom.bucketname}-${opt:stage}
+         SourceArn: "arn:aws:s3::"${self:custom.bucketname}-${opt:stage}
