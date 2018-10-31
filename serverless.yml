@@ -1,4 +1,5 @@
 # https://github.com/serverless/serverless/issues/2967
+# https://github.com/manwaring/serverless-bucket-events/blob/master/serverless.yml
 
 service: resize-image-lambda
 description: The AWS CF Serverless template for resize-image-${opt:stage}
@@ -96,12 +97,12 @@ resources:
         AccessControl: PublicRead
         NotificationConfiguration:
           LambdaConfigurations:
-#          - Event: 's3:ObjectCreated:*'
-#            Function:
-#              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
-          - Event: 's3:ObjectDelete:*'
+          - Event: 's3:ObjectCreated:*'
             Function:
               "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
+#          - Event: 's3:ObjectDelete:*'
+#            Function:
+#              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
         WebsiteConfiguration:
           IndexDocument: index.html
