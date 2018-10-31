@@ -95,8 +95,8 @@ resources:
         NotificationConfiguration:
           LambdaConfigurations:
             - Event: 's3:ObjectCreated:*'
-              Function:
-                'Fn::GetAtt': [ ResizeImage, Arn ]
+              Function: !GetAtt ResizeImage.Arn
+#                'Fn::GetAtt': [ ResizeImage, Arn ]
 #               'Fn::GetAtt': [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
         WebsiteConfiguration:
