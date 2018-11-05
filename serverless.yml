@@ -97,12 +97,12 @@ resources:
         AccessControl: PublicRead
         NotificationConfiguration:
           LambdaConfigurations:
-          - Event: 's3:*'
-            Function:
-              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
-#          - Event: 's3:ObjectCreated:*'
+#          - Event: 's3:*'
 #            Function:
 #              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
+          - Event: 's3:ObjectCreated:*'
+            Function:
+              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
 #          - Event: 's3:ObjectDelete:*'
 #            Function:
 #              "Fn::GetAtt": [ ResizeImageLambdaFunction, Arn ]
