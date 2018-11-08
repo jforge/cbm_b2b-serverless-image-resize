@@ -1,5 +1,5 @@
-const AWS = require('aws-sdk');
-const S3 = new AWS.S3({signatureVersion: 'v4'});
+const AWSS3 = require('aws-sdk/clients/s3');
+const S3 = new AWSS3({signatureVersion: 'v4'});
 const Sharp = require('sharp');
 const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
@@ -11,19 +11,19 @@ const getInfoFromPath = (newPath) => {
   const width = parseInt(match[3], 10);
   const height = parseInt(match[4], 10);
   const file = match[5];
-  const oldPath = `${folder}/${file}`;
+  const originalImgPath = `${folder}/${file}`;
   const resolution = `${width}x${height}`;
   console.log('getInfoFromPath', {
-    match,
     width,
     height,
-    originalImgPath: oldPath,
+    originalImgPath,
     resolution
   });
-  return {match, width, height, originalImgPath: oldPath, resolution};
+  return {match, width, height, originalImgPath, resolution};
 };
 
 exports.handler = function (event, context, callback) {
+  console.warn(JSON.stringify(event));
   const {queryStringParameters, Records} = event;
   const isApiGatewayEvent = queryStringParameters && queryStringParameters.key && queryStringParameters.key !== "";
   const isS3Event = Records && Records !== "";
@@ -39,12 +39,13 @@ exports.handler = function (event, context, callback) {
     return;
   }
   if (isApiGatewayEvent) {
+    console.info("isApiGatewayEvent : payload => ",queryStringParameters.key );
     resizedImgPath = queryStringParameters.key;
   }
   if (isS3Event) {
     const {eventName} = Records;
-    const isPutEvent = eventName === 'ObjectRemoved:DeleteMarkerCreated';
-    const isDeleteEvent = eventName === 'ObjectCreated:Put';
+    const isDeleteEvent = eventName === 'ObjectRemoved:DeleteMarkerCreated';
+    const isPutEvent = eventName === 'ObjectCreated:Put';
     const path = Records[0].s3.object.key;
     if (isPutEvent) {
       console.log('call from S3 - event : put - todo : create folders &' +
@@ -90,22 +91,28 @@ const resizeAndUploadToS3 = (originalImgPath, width, height, resizedImgPath, cal
   // get original img
   S3.getObject({Bucket: BUCKET, Key: originalImgPath})
     .promise()
-    .then(data => Sharp(data.Body)
+    .then(({Body}) => Sharp(Body)
       .resize(width, height)
-      .min()
+      .max()
       .withoutEnlargement()
-      .jpeg()
       .toBuffer()
     )
-    // upload resized image to s3
-    .then(buffer => S3.putObject({
-        Body: buffer,
-        Bucket: BUCKET,
-        ContentType: 'image/jpeg',
-        Key: resizedImgPath,
-      }).promise()
+    .then(buffer => {
+     // get img format from buffer in order to set correct ContentType
+     Sharp(buffer)
+        .metadata()
+        .then(({format}) => {
+          // upload resized image to s3 bucket
+          S3.putObject({
+            Body: buffer,
+            Bucket: BUCKET,
+            ContentType: `image/${format}`,
+            Key: resizedImgPath,
+          }).promise()
+        });
+      }
     )
-    // return 301 with new resized img path
+    // return 301 with resized img path
     .then(() => callback(null, {
         statusCode: '301',
         headers: {'location': `${URL}/${resizedImgPath}`},

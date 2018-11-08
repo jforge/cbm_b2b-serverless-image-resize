@@ -1,7 +1,8 @@
 {
   "ResizeImageLambda" : {
-    "BUCKET": "dev-vitrines-files",
+    "BUCKET": "vitrines-files-cf-dev",
     "ALLOWED_RESOLUTIONS": "800x600",
-    "URL": "https://dev-vitrines-files.s3-eu-west-1.amazonaws.com"
+    "URL": "https://vitrines-files-cf-dev.s3-eu-west-1.amazonaws.com",
+    "Environment": "dev"
   }
 }
