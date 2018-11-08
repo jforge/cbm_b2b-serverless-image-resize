@@ -95,18 +95,6 @@ resources:
       Properties:
         BucketName: ${self:custom.bucketname}-${opt:stage}
         AccessControl: PublicRead
-        PolicyDocument:
-          Statement:
-          - Action:
-            - "s3:GetObject"
-            Effect: "Allow"
-            Resource:
-              Fn::Join:
-              - ""
-              - - "arn:aws:s3:::"
-                - ${self:custom.bucketname}-${opt:stage}
-                - "/*"
-            Principal: "*"
         NotificationConfiguration:
           LambdaConfigurations:
           - Event: 's3:ObjectCreated:*'
