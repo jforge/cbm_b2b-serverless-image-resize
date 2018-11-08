@@ -135,3 +135,20 @@ resources:
         Action: "lambda:InvokeFunction"
         Principal: "s3.amazonaws.com"
         SourceArn: "arn:aws:s3:::${self:custom.bucketname}-${opt:stage}"
+    ImageBucketBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: "ImageBucket"
+        PolicyDocument:
+          Statement:
+          - Action:
+            - "s3:GetObject"
+            Effect: "Allow"
+            Resource:
+              Fn::Join:
+              - ""
+              - - "arn:aws:s3:::"
+                - Ref: "ImageBucket"
+                - "/*"
+            Principal: "*"
