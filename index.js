@@ -5,15 +5,17 @@ const BUCKET = process.env.BUCKET;
 const URL = process.env.URL;
 const ALLOWED_RESOLUTIONS = process.env.ALLOWED_RESOLUTIONS ? new Set(process.env.ALLOWED_RESOLUTIONS.split(/\s*,\s*/)) : new Set([]);
 
-const getInfoFromPath = (newPath) => {
-  const match = newPath.match(/(\w+)\/?(\D*)\/(\d+)x(\d+)\/(\S+)/);
+const getInfoFromPath = (path) => {
+  console.log('getInfoFromPath : path =>>>', path);
+  const match = path.match(/(\w+)\/?(\D*)\/(\d+)x(\d+)\/(\S+)/);
   const folder = match[2] === '' ? match[1] : `${match[1]}/${match[2]}`;
   const width = parseInt(match[3], 10);
   const height = parseInt(match[4], 10);
   const file = match[5].replace('/','');
   const originalImgPath = `${folder}/${file}`;
   const resolution = `${width}x${height}`;
-  return {match, width, height, originalImgPath, resolution};
+  console.log('getInfoFromPath' , {match, width, height, originalImgPath, resolution});
+  return {match, width, height, originalImgPath, resolution, folder, file};
 };
 
 exports.handler = function (event, context, callback) {
@@ -57,9 +59,12 @@ exports.handler = function (event, context, callback) {
         resizeAndUploadToS3(path, parseInt(width,10), parseInt(height,10), resizedImgPath, callback);
       });
     } else if (isDeleteEvent) {
+      const match = path.match(/(\w+)\/?(\D*)\/(\d+)x(\d+)\/(\S+)/);
+      const hasResolution = match != null ;
+      console.log('prefix : ',hasResolution ? `${match[3]}x${match[4]}` : folder);
       const params = {
         Bucket: BUCKET,
-        Prefix: folder
+        Prefix: hasResolution ? `${match[3]}x${match[4]}` : folder
       };
       console.log('delete event : folder to delete =>>>', params);
       S3.listObjectsV2(params, (err, data) => {
@@ -78,7 +83,7 @@ exports.handler = function (event, context, callback) {
             if (err) {
               console.error(err, err.stack);
             } else {
-              console.log('deleted object', JSON.stringify(data));
+              console.log('deleted following object', JSON.stringify(data));
             }
           });
         }
