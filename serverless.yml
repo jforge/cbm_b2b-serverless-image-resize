@@ -28,7 +28,7 @@ provider:
     VersionTag: "1.0"
   environment:
     Environment: ${opt:stage}
-    ALLOWED_RESOLUTIONS: 800x600
+    ALLOWED_RESOLUTIONS: 800x600,1024x768
     BUCKET: ${self:custom.bucketname}-${opt:stage}
     URL: https://${self:custom.bucketname}-${opt:stage}.s3-eu-west-1.amazonaws.com
   iamRoleStatements:
