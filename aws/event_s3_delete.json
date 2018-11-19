@@ -1,0 +1,36 @@
+{
+  "Records": [
+    {
+      "eventVersion": "2.0",
+      "eventSource": "aws:s3",
+      "awsRegion": "eu-west-1",
+      "eventTime": "2018-11-19T15:18:51.496Z",
+      "eventName": "ObjectRemoved:Delete",
+      "userIdentity": {
+        "principalId": "AWS:AROAIYT6535JH4L4WUPAA:acupi"
+      },
+      "requestParameters": {
+        "sourceIPAddress": "176.67.93.77"
+      },
+      "responseElements": {
+        "x-amz-request-id": "469ED9AD8FD3D623",
+        "x-amz-id-2": "Acc152icNs3NxeveF+Ng5FwEBXYgNJxZ7mVe14aeeyXIqwpu0M55zfvRds2WT+ruvqwx5BO8O/c="
+      },
+      "s3": {
+        "s3SchemaVersion": "1.0",
+        "configurationId": "9bd61237-44ad-43c8-974f-f3cdb3912cdf",
+        "bucket": {
+          "name": "vitrines-files-cf-dev",
+          "ownerIdentity": {
+            "principalId": "A1MN3X1S6J0JF1"
+          },
+          "arn": "arn:aws:s3:::vitrines-files-cf-dev"
+        },
+        "object": {
+          "key": "C004026/C004026_1496500946361.jpg",
+          "sequencer": "005BF2D45B7AB9889A"
+        }
+      }
+    }
+  ]
+}
